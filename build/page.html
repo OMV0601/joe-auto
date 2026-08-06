@@ -1,0 +1,653 @@
+<style>
+/*@FONTS@*/
+
+/* ── TOKENS ───────────────────────────────────────────────────────────────
+   Gulf livery: petrol blue, warm cream, marigold. Straight out of the
+   motorsport/garage world, and warm rather than spooky — the previous
+   near-black ground was what made orange read as Halloween.
+   Light is the default: people look at this standing outdoors next to a
+   car that has just broken, often in daylight.
+   ------------------------------------------------------------------ */
+:root,
+:root[data-theme="light"]{
+  --ground:#F5F1E8;  --raised:#E7EFF2;  --rule:#CDD8DC;
+  --ink:#16323C;     --ink-dim:#556A72;
+  --accent:#A8460F;  --accent-bright:#EE7127; --accent-ink:#FFFFFF;
+  --panel:#16323C;   --panel-ink:#F1ECE0; --panel-dim:#9DB2BA; --panel-rule:#6E8B95;
+  --focus:#A8460F;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --ground:#14252B;  --raised:#1B3038;  --rule:#2F4B55;
+    --ink:#EFE9DC;     --ink-dim:#9DB2BA;
+    --accent:#F79445;  --accent-bright:#F79445; --accent-ink:#14252B;
+    --panel:#E7EFF2;   --panel-ink:#16323C; --panel-dim:#55686F; --panel-rule:#6F838C;
+    --focus:#F79445;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14252B;  --raised:#1B3038;  --rule:#2F4B55;
+  --ink:#EFE9DC;     --ink-dim:#9DB2BA;
+  --accent:#F79445;  --accent-bright:#F79445; --accent-ink:#14252B;
+  --panel:#E7EFF2;   --panel-ink:#16323C; --panel-dim:#55686F; --panel-rule:#6F838C;
+  --focus:#F79445;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:'IBM Plex Sans',system-ui,sans-serif; font-weight:400;
+  font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,p,ul,ol,figure{margin:0}
+ul,ol{padding:0; list-style:none}
+a{color:inherit}
+img{max-width:100%; display:block}
+:where(a,button,input,[tabindex]):focus-visible{
+  outline:2px solid var(--focus); outline-offset:3px; border-radius:1px;
+}
+
+.slab{font-family:'Zilla Slab',Georgia,serif; font-weight:700; line-height:1.02}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums}
+.eyebrow{
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-dim);
+}
+.todo{
+  color:var(--accent); font-family:'IBM Plex Mono',ui-monospace,monospace;
+  font-size:.82em; letter-spacing:.04em; border:1px dashed currentColor;
+  padding:.1em .45em; border-radius:2px; white-space:nowrap;
+}
+
+/* ── CONTACT BAR ─────────────────────────────────────────────────────── */
+.bar{
+  position:sticky; top:0; z-index:40; display:flex; gap:1px;
+  background:var(--rule); border-bottom:1px solid var(--rule);
+}
+.bar a{
+  flex:1 1 0; display:flex; align-items:center; justify-content:center; gap:.6em;
+  padding:.85rem 1rem; text-decoration:none; background:var(--ground);
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:14px;
+  letter-spacing:.08em; text-transform:uppercase;
+}
+.bar a.is-primary{background:var(--accent); color:var(--accent-ink); font-weight:600}
+.bar .num{letter-spacing:.02em; text-transform:none; font-size:15px}
+.bar svg{width:15px; height:15px; flex:none}
+
+/* ── HERO ─────────────────────────────────────────────────────────────── */
+.hero{overflow-x:clip; padding:clamp(3rem,9vw,7rem) 0 clamp(2.5rem,6vw,4.5rem)}
+.hero-in{max-width:1180px; margin:0 auto; padding:0 clamp(1.25rem,4vw,3rem)}
+.hero h1{
+  font-family:'Zilla Slab',Georgia,serif; font-weight:700; line-height:.98;
+  font-size:clamp(2.9rem,8.4vw,6.2rem); letter-spacing:-.015em;
+  margin:1.1rem 0 0; max-width:15ch; text-wrap:balance;
+}
+.hero h1 em{font-style:normal; color:var(--accent)}
+.hero p{margin:1.6rem 0 0; max-width:46ch; font-size:clamp(1.02rem,1.6vw,1.22rem); color:var(--ink-dim)}
+.plate{margin-top:clamp(2.5rem,5vw,3.5rem)}
+.plate-num{
+  display:block; font-family:'IBM Plex Mono',ui-monospace,monospace; font-weight:600;
+  font-size:clamp(2.7rem,calc(12.6vw - .9rem),9.5rem); line-height:1.08;
+  letter-spacing:-.045em; color:var(--accent); white-space:nowrap;
+  text-decoration:none; font-variant-numeric:tabular-nums;
+}
+/* The parens overflow the line box at display sizes, so the rule below needs
+   real clearance — at line-height .9 the glyphs sat straight on top of it. */
+.plate-rule{display:flex; align-items:center; gap:1rem; margin-top:2rem; flex-wrap:wrap}
+.plate-rule .line{flex:1 1 60px; height:1px; background:var(--rule)}
+
+/* ── SECTION FURNITURE ───────────────────────────────────────────────── */
+.wrap{max-width:1180px; margin:0 auto; padding-inline:clamp(1.25rem,4vw,3rem)}
+.wrap-tight{max-width:760px; margin:0 auto; padding-inline:clamp(1.25rem,4vw,3rem)}
+.head{display:flex; flex-direction:column; gap:.7rem}
+.head h2{
+  font-family:'Zilla Slab',Georgia,serif; font-weight:700; line-height:1.04;
+  font-size:clamp(1.85rem,4.2vw,3rem); letter-spacing:-.012em; text-wrap:balance;
+}
+.head p{color:var(--ink-dim); max-width:52ch}
+.hr{height:2px; background:var(--ink); transform-origin:left center; margin-bottom:1.4rem}
+
+/* ── DIAGRAM ─────────────────────────────────────────────────────────── */
+.diagram{padding:clamp(3rem,7vw,5.5rem) 0; border-top:1px solid var(--rule)}
+.diagram .head{padding-inline:clamp(1.25rem,4vw,3rem); max-width:1180px; margin:0 auto}
+.rig{
+  margin-top:clamp(2rem,4vw,3rem); display:grid; gap:clamp(1.5rem,3vw,2.5rem);
+  grid-template-columns:1fr; align-items:start;
+  max-width:1180px; margin-inline:auto; padding-inline:clamp(1.25rem,4vw,3rem);
+}
+@media (min-width:900px){ .rig{grid-template-columns:minmax(0,1fr) 336px} }
+
+.plan{width:100%; height:auto; display:block; touch-action:manipulation}
+.plan .sheet{fill:none; stroke:var(--rule); stroke-width:1}
+.plan .body{fill:none; stroke:var(--ink); stroke-width:2.25; stroke-linejoin:round; stroke-linecap:round}
+.plan .detail{fill:none; stroke:var(--ink-dim); stroke-width:1.5; stroke-linecap:round}
+.plan .glass{fill:var(--raised); stroke:var(--ink-dim); stroke-width:1.25}
+.plan .tyre{fill:none; stroke:var(--ink); stroke-width:2.25}
+.plan .hub{fill:none; stroke:var(--ink-dim); stroke-width:1.5}
+.plan .spoke{stroke:var(--ink-dim); stroke-width:1.5; stroke-linecap:round}
+.wheel{transform-box:fill-box; transform-origin:center}
+
+.zone{cursor:pointer; -webkit-tap-highlight-color:transparent}
+.zone .hit{fill:transparent; stroke:none}
+.zone .wash{fill:var(--accent-bright); opacity:0; transition:opacity .18s ease}
+.zone .pin{fill:var(--ground); stroke:var(--ink-dim); stroke-width:1.5; transition:fill .18s ease,stroke .18s ease}
+.zone .pin-n{
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:15px; font-weight:600;
+  fill:var(--ink-dim); text-anchor:middle; dominant-baseline:central;
+  transition:fill .18s ease; pointer-events:none;
+}
+.zone:hover .pin{stroke:var(--accent)}
+.zone:hover .pin-n{fill:var(--accent)}
+.zone[aria-checked="true"] .wash{opacity:.18}
+.zone[aria-checked="true"] .pin{fill:var(--accent); stroke:var(--accent)}
+.zone[aria-checked="true"] .pin-n{fill:var(--accent-ink)}
+.zone:focus{outline:none}
+.zone:focus-visible .pin{stroke:var(--focus); stroke-width:3}
+
+.rail{border-top:2px solid var(--ink)}
+.rail-h{display:flex; align-items:baseline; justify-content:space-between; gap:1rem; padding:.7rem 0 .9rem}
+.rail-h .n{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:13px; color:var(--accent); letter-spacing:.1em}
+.rail-h .t{font-family:'Zilla Slab',Georgia,serif; font-weight:700; font-size:1.18rem; line-height:1.15}
+.ops{border-top:1px solid var(--rule)}
+.ops li{display:grid; grid-template-columns:2.6rem 1fr auto; gap:.75rem;
+        align-items:baseline; padding:.6rem .2rem; border-bottom:1px solid var(--rule)}
+.ops .idx{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12.5px; color:var(--ink-dim)}
+.ops .op{font-size:15px}
+.ops .kind{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11.5px;
+           letter-spacing:.09em; text-transform:uppercase; color:var(--ink-dim); white-space:nowrap}
+.rail-foot{padding:.9rem 0 0; font-size:13.5px; color:var(--ink-dim)}
+
+/* ── FULL SERVICE INDEX ──────────────────────────────────────────────── */
+.index{padding:clamp(3rem,7vw,5.5rem) 0; border-top:1px solid var(--rule)}
+.cols{margin-top:2.6rem; columns:3 240px; column-gap:clamp(1.5rem,3vw,3rem)}
+.grp{break-inside:avoid; margin-bottom:2rem}
+.grp h3{
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11.5px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
+  padding-bottom:.5rem; border-bottom:1px solid var(--rule); margin-bottom:.6rem;
+}
+.grp li{font-size:15px; padding:.22rem 0; color:var(--ink-dim)}
+.grp li b{font-weight:400; color:var(--ink)}
+
+/* ── GALLERY — the rhythm break: full bleed, inverted ────────────────── */
+.gallery{background:var(--panel); color:var(--panel-ink); padding:clamp(3rem,7vw,5.5rem) 0}
+.gallery .eyebrow{color:var(--panel-dim)}
+.gallery h2{
+  font-family:'Zilla Slab',Georgia,serif; font-weight:700; line-height:1.04;
+  font-size:clamp(1.85rem,4.2vw,3rem); letter-spacing:-.012em; text-wrap:balance;
+}
+.gallery .lede{color:var(--panel-dim); max-width:52ch; margin-top:.7rem}
+.shots{
+  margin-top:2.6rem; display:grid; gap:clamp(.75rem,1.6vw,1.1rem);
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+}
+.shot{position:relative; aspect-ratio:4/3; overflow:hidden; background:rgba(128,128,128,.08)}
+.shot img{width:100%; height:100%; object-fit:cover}
+.slot{
+  position:absolute; inset:0; border:1.5px dashed var(--panel-rule);
+  display:flex; flex-direction:column; justify-content:space-between;
+  padding:.9rem 1rem; gap:.5rem;
+}
+.slot .sn{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11.5px;
+          letter-spacing:.12em; color:var(--panel-dim)}
+.slot .sw{font-size:14.5px; line-height:1.35; color:var(--panel-ink)}
+.cap{margin-top:.55rem; font-size:13.5px; color:var(--panel-dim)}
+.gallery .foot-note{margin-top:2rem; font-size:13.5px; color:var(--panel-dim); max-width:58ch}
+
+/* ── WHAT TO TELL HIM ────────────────────────────────────────────────── */
+.send{padding:clamp(3rem,7vw,5.5rem) 0}
+.steps{margin-top:2.4rem; display:flex; flex-direction:column}
+.steps li{display:grid; grid-template-columns:3.2rem 1fr; gap:1rem;
+          padding:1.15rem 0; border-top:1px solid var(--rule)}
+.steps li:last-child{border-bottom:1px solid var(--rule)}
+.steps .k{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:13px;
+          color:var(--accent); letter-spacing:.08em; padding-top:.25rem}
+.steps h3{font-family:'Zilla Slab',Georgia,serif; font-weight:700; font-size:1.24rem; line-height:1.2}
+.steps p{color:var(--ink-dim); margin-top:.25rem; font-size:15.5px; max-width:56ch}
+
+/* ── FOOTER ──────────────────────────────────────────────────────────── */
+.foot{padding:clamp(2.5rem,5vw,4rem) 0 3rem; border-top:1px solid var(--rule)}
+.foot-num{
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-weight:600;
+  font-size:clamp(1.6rem,5vw,2.6rem); letter-spacing:-.03em;
+  color:var(--accent); text-decoration:none; display:inline-block;
+}
+.foot-meta{margin-top:1.4rem; display:flex; flex-wrap:wrap; gap:.6rem 2rem; font-size:14px; color:var(--ink-dim)}
+.foot-meta b{font-weight:600; color:var(--ink)}
+.foot-fine{margin-top:1.6rem; font-size:13px; color:var(--ink-dim); max-width:60ch}
+
+@media (max-width:640px){
+  /* left/right are required: a fixed element without them shrinks to fit its
+     content instead of spanning the screen. */
+  .bar{position:fixed; top:auto; bottom:0; left:0; right:0;
+       border-bottom:0; border-top:1px solid var(--rule)}
+  .bar a{font-size:13px}
+  .foot{padding-bottom:calc(5.5rem + env(safe-area-inset-bottom,0px))}
+  .bar a{padding-bottom:calc(.85rem + env(safe-area-inset-bottom,0px))}
+}
+
+/* ══ MOTION ════════════════════════════════════════════════════════════
+   Two mechanisms, split by what each is actually good at — and by how bad
+   it is when one fails.
+
+   1  REVEALS decide whether content is VISIBLE, so they must never depend
+      on a scroll timeline resolving. They run on IntersectionObserver plus
+      plain transitions. The resting state below is fully visible; script
+      adds .pre to hide, the observer removes it on entry, and a timeout
+      clears it regardless. No script, no observer, a stalled timeline, a
+      printer — the page still shows everything.
+
+   2  CONTINUOUS effects run on scroll-driven CSS, which is genuinely
+      better at them and stays off the main thread. Neither one can hide
+      anything: if the timeline never resolves, the number just sits still.
+
+   Five moments, spread apart rather than one uniform fade-up per section:
+   the blueprint draws itself, the wheels turn as it arrives, the number
+   drifts against the scroll, section rules stroke across, and each photo
+   settles on its own arrival.
+   ------------------------------------------------------------------ */
+
+/* 1 — reveals. Resting state is VISIBLE; .pre is the hidden state. */
+.plan .body,.plan .detail{stroke-dasharray:1; stroke-dashoffset:0;
+  transition:stroke-dashoffset 1.5s cubic-bezier(.6,0,.3,1)}
+.plan .body.pre,.plan .detail.pre{stroke-dashoffset:1}
+.plan .detail{transition-delay:.4s}
+.plan .glass,.plan .tyre,.plan .hub,.plan .spoke{opacity:1; transition:opacity .8s ease .65s}
+.plan .glass.pre,.plan .tyre.pre,.plan .hub.pre,.plan .spoke.pre{opacity:0}
+.zone .pin,.zone .pin-n{transition:opacity .5s ease 1.05s}
+.zone .pin.pre,.zone .pin-n.pre{opacity:0}
+.shot{transition:opacity .7s ease, translate .7s cubic-bezier(.2,.7,.3,1)}
+.shot.pre{opacity:0; translate:0 16px}
+.hr{transition:scale .9s cubic-bezier(.2,.7,.3,1)}
+.hr.pre{scale:0 1}
+
+/* 2 — continuous. Cannot gate visibility, so a stalled timeline is harmless. */
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .plate-num{animation:drift linear both; animation-timeline:scroll(root); animation-range:0 70vh}
+    .wheel{animation:roll linear both; animation-timeline:view(); animation-range:entry 10% cover 75%}
+  }
+}
+@keyframes drift { to { translate:0 34px } }
+@keyframes roll  { from { rotate:-160deg } to { rotate:0deg } }
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+  html{scroll-behavior:auto}
+  .pre{stroke-dashoffset:0 !important; opacity:1 !important;
+       translate:none !important; scale:none !important}
+}
+</style>
+
+<!-- ══ CONTACT ═════════════════════════════════════════════════════════ -->
+<nav class="bar" aria-label="Contact Joe">
+  <a href="#" data-tel class="is-primary">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+    Call <span class="num" data-display></span>
+  </a>
+</nav>
+
+<!-- ══ HERO ════════════════════════════════════════════════════════════ -->
+<header class="hero">
+  <div class="hero-in">
+    <p class="eyebrow">Mobile auto repair &middot; <span data-area></span></p>
+    <h1>No shop.<br>Joe drives to <em>your</em> car.</h1>
+    <p>Oil changes to engine swaps, brake jobs to a full respray. The work happens
+       wherever the car is sitting &mdash; your driveway, your street, your work lot.</p>
+    <div class="plate">
+      <a class="plate-num" href="#" data-tel data-display-big></a>
+      <div class="plate-rule">
+        <span class="eyebrow">Call it or text it</span>
+        <span class="line"></span>
+        <span class="eyebrow" data-hours></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ DIAGRAM ═════════════════════════════════════════════════════════ -->
+<section class="diagram" aria-labelledby="dg-h">
+  <div class="head">
+    <div class="hr"></div>
+    <p class="eyebrow">Fig. 1 &mdash; What he covers</p>
+    <h2 id="dg-h">Point at what&rsquo;s wrong.</h2>
+    <p>Pick any part of the car and you&rsquo;ll see the work Joe does there.
+       The full list is written out underneath.</p>
+  </div>
+
+  <div class="rig">
+    <svg class="plan" viewBox="0 0 1000 400" id="plan"
+         role="group" aria-label="Side view of a car with six selectable areas"
+         xmlns="http://www.w3.org/2000/svg">
+      <g class="sheet" aria-hidden="true">
+        <path d="M40 352 H960"/>
+        <path d="M40 344 V360 M960 344 V360"/>
+      </g>
+      <g aria-hidden="true">
+        <path class="body" pathLength="1" d="M74 254 L78 236 Q84 226 102 223 L306 214 L400 146 Q404 140 414 139
+                               L596 134 Q606 133 613 141 L704 208 L866 223 Q902 227 918 245
+                               L929 259 L932 286 L900 290 L822 290 Q764 178 706 290
+                               L294 290 Q236 178 178 290 L96 290 Q76 288 74 272 Z"/>
+        <path class="glass" d="M476 154 L588 150 L592 202 L476 202 Z"/>
+        <path class="glass" d="M412 158 L462 155 L462 202 L406 202 Z"/>
+        <path class="glass" d="M616 152 L692 204 L610 202 Z"/>
+        <path class="detail" pathLength="1" d="M470 150 V288 M308 210 V288"/>
+        <path class="detail" pathLength="1" d="M500 224 H534 M350 226 H384"/>
+        <path class="detail" pathLength="1" d="M892 232 L920 248 L914 262 L887 250 Z"/>
+        <path class="detail" pathLength="1" d="M78 244 L98 241 L100 258 L80 260 Z"/>
+        <path class="detail" pathLength="1" d="M898 278 L931 276 M74 268 L100 266"/>
+        <g class="wheel">
+          <circle class="tyre" cx="236" cy="294" r="58"/><circle class="hub" cx="236" cy="294" r="30"/>
+          <path class="spoke" d="M236 264 V324 M210 279 L262 309 M210 309 L262 279"/>
+        </g>
+        <g class="wheel">
+          <circle class="tyre" cx="764" cy="294" r="58"/><circle class="hub" cx="764" cy="294" r="30"/>
+          <path class="spoke" d="M764 264 V324 M738 279 L790 309 M738 309 L790 279"/>
+        </g>
+      </g>
+      <g id="zones" role="radiogroup" aria-label="Areas of the car"></g>
+    </svg>
+
+    <div class="rail">
+      <div class="rail-h">
+        <span class="n" id="rail-n">&mdash;</span>
+        <span class="t" id="rail-t">Pick an area</span>
+      </div>
+      <ul class="ops" id="ops"></ul>
+      <p class="rail-foot" id="rail-foot">Six areas. All of it happens at your place.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FULL SERVICE INDEX ══════════════════════════════════════════════ -->
+<section class="index" aria-labelledby="ix-h">
+  <div class="wrap">
+    <div class="head">
+      <div class="hr"></div>
+      <p class="eyebrow">Fig. 2 &mdash; Everything, written out</p>
+      <h2 id="ix-h">The whole list.</h2>
+      <p>If it isn&rsquo;t here, ask him anyway &mdash; this is the common work,
+         not the limit of it.</p>
+    </div>
+    <div class="cols" id="index-cols"></div>
+  </div>
+</section>
+
+<!-- ══ GALLERY ═════════════════════════════════════════════════════════ -->
+<section class="gallery" aria-labelledby="gl-h">
+  <div class="wrap">
+    <p class="eyebrow">Fig. 3 &mdash; His work</p>
+    <h2 id="gl-h">Jobs he&rsquo;s finished.</h2>
+    <p class="lede">Photos go here. Until Joe sends them these stay as marked
+       empty slots &mdash; borrowed pictures of someone else&rsquo;s work would be
+       worth less than nothing.</p>
+    <div class="shots" id="shots"></div>
+    <p class="foot-note" id="gallery-note"></p>
+  </div>
+</section>
+
+<!-- ══ WHAT TO TELL HIM ════════════════════════════════════════════════ -->
+<section class="send" aria-labelledby="sd-h">
+  <div class="wrap-tight">
+    <div class="head">
+      <div class="hr"></div>
+      <p class="eyebrow">Fig. 4 &mdash; Before you ring</p>
+      <h2 id="sd-h">Four things worth having ready.</h2>
+      <p>The more of this he has up front, the closer his first answer gets to a real number.</p>
+    </div>
+    <ol class="steps">
+      <li><span class="k">01</span><div>
+        <h3>The car</h3>
+        <p>Year, make, model. Engine size too, if you know it &mdash; parts change between trims.</p></div></li>
+      <li><span class="k">02</span><div>
+        <h3>What it&rsquo;s actually doing</h3>
+        <p>Sounds, smells, warning lights, when it started. &ldquo;Squeals on cold starts&rdquo; beats &ldquo;making a noise.&rdquo;</p></div></li>
+      <li><span class="k">03</span><div>
+        <h3>Where it&rsquo;s parked</h3>
+        <p>He&rsquo;s coming to the car, so it matters whether it&rsquo;s a driveway, a garage, or a kerb on a hill.</p></div></li>
+      <li><span class="k">04</span><div>
+        <h3>Whether it still drives</h3>
+        <p>A car that won&rsquo;t start is a different visit from one that just needs an oil change.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════════ -->
+<footer class="foot">
+  <div class="wrap">
+    <p class="eyebrow">Joe &mdash; mobile auto repair</p>
+    <a class="foot-num" href="#" data-tel data-display></a>
+    <div class="foot-meta">
+      <span>Comes to you &middot; <b data-area></b></span>
+      <span>Hours <b data-hours></b></span>
+    </div>
+    <p class="foot-fine">No tracking, no analytics, no database. This page collects nothing.</p>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   JOE — EDIT THIS BLOCK, NOTHING ELSE.
+   Any value left as CONFIRM_WITH_JOE shows on the page as a dashed
+   "need from Joe" tag, so it can never ship as a made-up fact.
+   ═══════════════════════════════════════════════════════════════════ */
+const BIZ = {
+  phone   : "+12535616361",        // powers the call and text links
+  display : "(253) 561-6361",      // how the number reads on screen
+  area    : "CONFIRM_WITH_JOE",    // e.g. "Tacoma & South Sound"
+  hours   : "CONFIRM_WITH_JOE",    // e.g. "Mon–Sat, 8am–7pm"
+};
+
+/* PHOTOS — drop files into photos/ and put the filename in `file`.
+   Leave it null and the slot stays a labelled placeholder.        */
+const PHOTOS = [
+  { file:null, want:"A car mid-job with tools out, at someone's house" },
+  { file:null, want:"Before and after on a dent or a scrape" },
+  { file:null, want:"A finished respray or a panel he colour-matched" },
+  { file:null, want:"An engine bay he's just worked in" },
+  { file:null, want:"Brakes off, rotors visible" },
+  { file:null, want:"Joe himself, working — people book a person" },
+];
+/* ═══════════════════════════════════════════════════════════════════ */
+
+/* What Joe does, by area of the car. R&R = remove and replace. */
+const ZONES = [
+  { id:"under",  n:"05", name:"Underneath",
+    ops:[["Exhaust section","R&R"],["Muffler","R&R"],["Shocks & struts","R&R"],
+         ["Control arm","R&R"],["Fluid leak","Diagnose"],["Oil pan gasket","R&R"]] },
+  { id:"body",   n:"04", name:"Body & paint",
+    ops:[["Door ding","Pull"],["Deep scratch","Refinish"],["Panel replacement","R&R"],
+         ["Full respray","Quote"],["Rust cut-out","Repair"],["Colour match","Refinish"]] },
+  { id:"engine", n:"01", name:"Hood & engine bay",
+    ops:[["Oil & filter","Service"],["Drive belt","R&R"],["Radiator hose","R&R"],
+         ["Alternator","R&R"],["Starter motor","R&R"],["Battery & terminals","R&R"],
+         ["Timing belt","R&R"],["Engine swap","Quote"],["Won't start","Diagnose"]] },
+  { id:"front",  n:"02", name:"Front end",
+    ops:[["Front guard / bumper","R&R"],["Fender","R&R"],["Headlight assembly","R&R"],
+         ["Grille","R&R"],["Dent pull","Repair"],["Paint match","Refinish"]] },
+  { id:"cabin",  n:"06", name:"Cabin & electrical",
+    ops:[["A/C not cold","Diagnose"],["Blower motor","R&R"],["Window regulator","R&R"],
+         ["Door lock actuator","R&R"],["Wiring fault","Diagnose"],["Dash warning light","Diagnose"]] },
+  { id:"wheels", n:"03", name:"Wheels & brakes",
+    ops:[["Brake pads","R&R"],["Rotors","R&R"],["Calipers","R&R"],
+         ["Wheel bearing","R&R"],["Tyre swap","Service"],["Grinding or squeal","Diagnose"]] },
+];
+
+const SHAPES = {
+  under : [{t:"rect", x:300, y:290, w:400, h:44}],
+  body  : [{t:"poly", p:"96,224 306,214 700,210 700,290 96,290"}],
+  engine: [{t:"poly", p:"700,206 866,222 872,268 700,268"}],
+  front : [{t:"poly", p:"866,220 920,244 934,286 872,290 872,264"}],
+  cabin : [{t:"poly", p:"306,214 400,146 596,134 704,208 700,212"}],
+  wheels: [{t:"circ", cx:236, cy:294, r:62},{t:"circ", cx:764, cy:294, r:62}],
+};
+/* Keep every badge clear of the hit shapes of zones painted LATER in this
+   list — those sit on top and would swallow the tap. The engine badge in
+   particular must stay outside the front wheel's r=62 circle at (764,294). */
+const PINS = {
+  engine:[800,230], front:[898,262], wheels:[764,294],
+  body:[400,252],   under:[500,312],  cabin:[500,178],
+};
+
+const SVGNS = "http://www.w3.org/2000/svg";
+const el = (n,a={}) => { const e=document.createElementNS(SVGNS,n);
+  for(const k in a) e.setAttribute(k,a[k]); return e; };
+
+/* ── values, or a visible placeholder ────────────────────────────────── */
+const NEED = "CONFIRM_WITH_JOE";
+function fill(sel, val){
+  document.querySelectorAll(sel).forEach(n => {
+    if(val === NEED) n.innerHTML = '<span class="todo">need from Joe</span>';
+    else n.textContent = val;
+  });
+}
+fill("[data-area]",  BIZ.area);
+fill("[data-hours]", BIZ.hours);
+document.querySelectorAll("[data-display],[data-display-big]")
+  .forEach(n => n.textContent = BIZ.display);
+document.querySelectorAll("[data-tel]").forEach(n => n.setAttribute("href","tel:"+BIZ.phone));
+
+/* ── keep the oversized number on screen whatever it is edited to ────── */
+const plate = document.querySelector(".plate-num");
+function fitPlate(){
+  plate.style.fontSize = "";
+  const rng = document.createRange(); rng.selectNodeContents(plate);
+  const w = rng.getBoundingClientRect().width;
+  const avail = window.innerWidth - plate.getBoundingClientRect().left - 14;
+  if(w > avail && w > 0){
+    const fs = parseFloat(getComputedStyle(plate).fontSize);
+    plate.style.fontSize = Math.floor(fs * avail / w) + "px";
+  }
+}
+addEventListener("resize", fitPlate);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitPlate);
+fitPlate();
+
+/* ── diagram ─────────────────────────────────────────────────────────── */
+const zonesG = document.getElementById("zones");
+ZONES.forEach((z,i) => {
+  const g = el("g",{class:"zone",role:"radio",tabindex:i===0?"0":"-1",
+                    "aria-checked":"false","aria-label":z.name,"data-id":z.id});
+  SHAPES[z.id].forEach(s => {
+    const mk = k => s.t==="rect" ? el("rect",{class:k,x:s.x,y:s.y,width:s.w,height:s.h})
+              : s.t==="circ" ? el("circle",{class:k,cx:s.cx,cy:s.cy,r:s.r})
+              : el("polygon",{class:k,points:s.p});
+    g.append(mk("wash"), mk("hit"));
+  });
+  const [px,py] = PINS[z.id];
+  g.append(el("circle",{class:"pin",cx:px,cy:py,r:17}));
+  const t = el("text",{class:"pin-n",x:px,y:py}); t.textContent = z.n;
+  g.append(t);
+  zonesG.append(g);
+});
+
+const railN = document.getElementById("rail-n");
+const railT = document.getElementById("rail-t");
+const railF = document.getElementById("rail-foot");
+const opsUl = document.getElementById("ops");
+const gs    = [...zonesG.querySelectorAll(".zone")];
+
+function select(id){
+  const z = ZONES.find(v => v.id === id);
+  gs.forEach(g => {
+    const on = g.dataset.id === id;
+    g.setAttribute("aria-checked", String(on));
+    g.setAttribute("tabindex", on ? "0" : "-1");
+  });
+  railN.textContent = z.n;
+  railT.textContent = z.name;
+  railF.textContent = z.ops.length + " common jobs in this area.";
+  opsUl.replaceChildren(...z.ops.map(([op,kind],i) => {
+    const li = document.createElement("li");
+    li.innerHTML = '<span class="idx"></span><span class="op"></span><span class="kind"></span>';
+    li.querySelector(".idx").textContent  = String(i+1).padStart(2,"0");
+    li.querySelector(".op").textContent   = op;
+    li.querySelector(".kind").textContent = kind;
+    return li;
+  }));
+}
+
+gs.forEach((g,i) => {
+  g.addEventListener("click", () => select(g.dataset.id));
+  g.addEventListener("keydown", e => {
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); select(g.dataset.id); }
+    else if(e.key === "ArrowRight" || e.key === "ArrowDown"){
+      e.preventDefault(); const n = gs[(i+1)%gs.length]; n.focus(); select(n.dataset.id);
+    } else if(e.key === "ArrowLeft" || e.key === "ArrowUp"){
+      e.preventDefault(); const n = gs[(i-1+gs.length)%gs.length]; n.focus(); select(n.dataset.id);
+    }
+  });
+});
+
+/* ── the written-out index, from the same data ───────────────────────── */
+document.getElementById("index-cols").replaceChildren(
+  ...[...ZONES].sort((a,b) => a.n.localeCompare(b.n)).map(z => {
+    const d  = document.createElement("div"); d.className = "grp";
+    const h  = document.createElement("h3");  h.textContent = z.n + " — " + z.name;
+    const ul = document.createElement("ul");
+    ul.append(...z.ops.map(([op,kind]) => {
+      const li = document.createElement("li");
+      li.innerHTML = '<b></b> — <span></span>';
+      li.querySelector("b").textContent = op;
+      li.querySelector("span").textContent = kind.toLowerCase();
+      return li;
+    }));
+    d.append(h, ul);
+    return d;
+  })
+);
+
+/* ── gallery: real photo or a labelled empty slot ────────────────────── */
+const shots = document.getElementById("shots");
+shots.replaceChildren(...PHOTOS.map((p,i) => {
+  const fig = document.createElement("figure");
+  fig.className = "shot";
+  if(p.file){
+    const img = document.createElement("img");
+    img.src = "photos/" + p.file; img.alt = p.want; img.loading = "lazy";
+    fig.append(img);
+  } else {
+    const slot = document.createElement("div");
+    slot.className = "slot";
+    slot.innerHTML = '<span class="sn"></span><span class="sw"></span>';
+    slot.querySelector(".sn").textContent = "SLOT " + String(i+1).padStart(2,"0");
+    slot.querySelector(".sw").textContent = p.want;
+    fig.append(slot);
+  }
+  return fig;
+}));
+const waiting = PHOTOS.filter(p => !p.file).length;
+document.getElementById("gallery-note").textContent = waiting
+  ? waiting + " of " + PHOTOS.length + " slots still waiting on photos. Drop files into the "
+    + "photos folder and add the filenames to the PHOTOS list to fill them."
+  : "";
+
+/* ── reveal on entry ─────────────────────────────────────────────────
+   Runs last, so it catches the pins and photo tiles built above. The
+   hidden state is only ever applied by this block, which means every
+   path that skips it — no script, no observer, reduced motion — leaves
+   the page fully visible instead of blank.                            */
+(() => {
+  if(!matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
+  if(!("IntersectionObserver" in window)) return;
+
+  const els = [...document.querySelectorAll(
+    ".hr, .shot, .plan .body, .plan .detail, .plan .glass, .plan .tyre," +
+    ".plan .hub, .plan .spoke, .zone .pin, .zone .pin-n")];
+  if(!els.length) return;
+
+  els.forEach(e => e.classList.add("pre"));
+  const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach(en => {
+      if(en.isIntersecting){ en.target.classList.remove("pre"); obs.unobserve(en.target); }
+    });
+  }, { rootMargin:"0px 0px -6% 0px" });
+  els.forEach(e => io.observe(e));
+
+  /* Belt and braces: nothing is still hidden a few seconds in, whatever
+     went wrong. An unseen animation is a far smaller problem than an
+     invisible page. */
+  setTimeout(() => els.forEach(e => e.classList.remove("pre")), 4000);
+})();
+</script>
