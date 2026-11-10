@@ -4,8 +4,8 @@ A one-page site for Joe, who does auto repair at the customer's place and has no
 shop. It's built to be **shown**: Joe pulls it up on his phone when he's pitching
 someone, and it answers "what do you actually do?" without him having to list it.
 
-`index.html` is the whole site. One file, no build step, no dependencies, no
-server, no network requests at all. Double-click it to open it.
+`index.html` is the whole site, plus two images in `media/`. No build step, no
+dependencies, no server, no third-party requests. Double-click it to open it.
 
 ---
 
@@ -57,6 +57,7 @@ URL means that number can be scraped. Worth his explicit okay first.
 ```
 index.html      the site — this is the deliverable
 artifact.html   same page, body only, for the hosted preview link
+media/          the car render the tour uses (car.webp, car-2k.webp)
 photos/         Joe's photos go here (see its README)
 build/
   page.html     source used to generate both pages
@@ -91,29 +92,35 @@ the hosted preview blocks external requests — a `<link>` would silently fall
 back to system fonts and quietly destroy the type hierarchy. Zilla Slab for
 headings, IBM Plex Sans for prose, IBM Plex Mono for numbers and labels.
 
-**The landing screen is a tour of the car.** One technical drawing stays
-pinned while the copy scrolls past it; each step tells the drawing which part
-to look at. Opening: the whole car. Then the engine bay, front end, a wheel,
-the bodywork, the underside, the cabin — and back out to the whole car with the
-number. Six areas, no photographs needed.
+**The landing screen is a tour of the car.** A studio photograph of a sedan
+stays pinned while the copy scrolls past it, and a camera glides across the
+photo: the whole car, then the engine bay, front end, a wheel, the bodywork,
+the underside, the cabin, and back out to the whole car with the number.
 
-How it works, in three pieces:
+**The car is a generated render, not a real customer's car.** Joe has no
+photos yet, so `media/car.webp` (3840px, transparent background) and
+`media/car-2k.webp` (phones) are an AI studio render of a generic, unbranded
+sedan — no badges, no plate. It is used purely as the thing the tour points at;
+it is never presented as his work. When he sends real photos they go in the
+gallery, not here.
+
+How the tour works, in three pieces:
 
 1. **Pinned stage.** `.stage` is `position: sticky`; the `.steps` column scrolls
-   over it (desktop, left 44%) or under it (phone, where the stage is the top
-   42% of the screen). An `IntersectionObserver` with a thin band in the
-   middle of the viewport decides which step is "in front of" the reader.
-2. **Zoom is one CSS transform.** `applyFocus()` takes the active area's focus
-   box in drawing units, works out the scale that fits it in the car area, and
-   sets `translate() scale()` on the `<svg>` so the box's centre lands in the
-   middle of the stage. A 1.15s transition does the camera move. Every stroke
-   uses `vector-effect: non-scaling-stroke`, so lines stay hairline at 4× zoom,
-   and label text is sized by `1 / (zoom × px-per-unit)` so it stays the same
-   size on screen whatever the zoom.
-3. **X-ray.** Each area's internals (engine block, brake disc and caliper,
-   exhaust run, seats and harness…) live in their own `<g class="part">`,
-   hidden until their step is active. When any part is lit the shell drops to
-   40% so the internals read.
+   over it (desktop, left 42%) or under it (phone, where the stage is the top
+   44% of the screen).
+2. **A continuous camera.** Each area has a focus box on the photo, in photo
+   pixels. On every frame the script works out how far the reader is through
+   the steps as a fractional index, blends the two nearest boxes into one
+   target (dwell, glide, dwell), eases the live camera toward it, and writes a
+   single `translate() scale()` transform on the wrapper that holds both the
+   photo and the SVG overlay. So the move is tied to the scroll, not to a
+   timer, and scrolling backwards plays it in reverse.
+3. **HUD, not drawings.** Each area's overlay is corner brackets, a dashed
+   frame, a couple of accent shapes aligned to the photo, pulsing hotspots, a
+   scan line and a label. Strokes use `vector-effect: non-scaling-stroke` and
+   label text is sized by `1 / (zoom × px-per-photo-pixel)`, so lines stay
+   hairline and type stays the same size on screen at any zoom.
 
 **One source of truth.** `ZONES` at the bottom of the file holds the areas, the
 copy, the focus boxes and the job lists. The tour steps, the callouts on the
@@ -122,17 +129,14 @@ it.
 
 ### Motion
 
-**Reveals** — the drawing stroking itself in on load, step copy rising in,
-section rules sweeping across — have a *visible* resting state. Script adds a
-hidden class, an observer removes it, and a timeout clears everything after a
-few seconds regardless. No script, no observer, a printer: the page still
-shows everything. (Because of `non-scaling-stroke`, dash lengths are in screen
-pixels, so the draw-on measures each path and multiplies by the render scale
-rather than using the usual `pathLength="1"` trick.)
+**Reveals** — the headline rising word by word, step copy and chips lifting
+in, section rules sweeping across — have a *visible* resting state. Script adds
+a hidden class, an observer removes it, and a timeout clears everything after a
+few seconds regardless. No script, no observer, a printer: the page still shows
+everything, with the whole car sitting in the stage.
 
-**Continuous effects** — the car rolling in from the right on load, and the
-wheels turning with the scroll via `animation-timeline: scroll()` — can't hide
-anything if they fail to run.
+**Continuous effects** — the camera, the grid drifting behind the car, the
+ticker of jobs sliding with the scroll — can't hide anything if they fail.
 
 Everything is off under `prefers-reduced-motion: reduce`.
 
