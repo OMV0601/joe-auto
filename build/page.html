@@ -2,35 +2,37 @@
 /*@FONTS@*/
 
 /* ── TOKENS ───────────────────────────────────────────────────────────────
-   Gulf livery: petrol blue, warm cream, marigold. Straight out of the
-   motorsport/garage world, and warm rather than spooky — the previous
-   near-black ground was what made orange read as Halloween.
-   Light is the default: people look at this standing outdoors next to a
-   car that has just broken, often in daylight.
+   Gulf livery: petrol blue, warm cream, marigold.
+   The page is light by default (people read it outdoors next to a broken
+   car). The TOUR — the landing stage — is always deep petrol, in both
+   themes: it is the one dark, cinematic moment on the page.
    ------------------------------------------------------------------ */
 :root,
 :root[data-theme="light"]{
   --ground:#F5F1E8;  --raised:#E7EFF2;  --rule:#CDD8DC;
   --ink:#16323C;     --ink-dim:#556A72;
   --accent:#A8460F;  --accent-bright:#EE7127; --accent-ink:#FFFFFF;
-  --panel:#16323C;   --panel-ink:#F1ECE0; --panel-dim:#9DB2BA; --panel-rule:#6E8B95;
   --focus:#A8460F;
+  /* stage (always dark) */
+  --st-bg:#0F2229;   --st-bg-2:#13303A; --st-ink:#F1ECE0; --st-dim:#8AA3AC;
+  --st-line:#5F7C86; --st-rule:rgba(241,236,224,.10); --st-grid:rgba(241,236,224,.045);
+  --st-accent:#F79445; --st-accent-ink:#14252B;
 }
 @media (prefers-color-scheme:dark){
   :root{
     --ground:#14252B;  --raised:#1B3038;  --rule:#2F4B55;
     --ink:#EFE9DC;     --ink-dim:#9DB2BA;
     --accent:#F79445;  --accent-bright:#F79445; --accent-ink:#14252B;
-    --panel:#E7EFF2;   --panel-ink:#16323C; --panel-dim:#55686F; --panel-rule:#6F838C;
     --focus:#F79445;
+    --st-bg:#0B1A20;   --st-bg-2:#10262E;
   }
 }
 :root[data-theme="dark"]{
   --ground:#14252B;  --raised:#1B3038;  --rule:#2F4B55;
   --ink:#EFE9DC;     --ink-dim:#9DB2BA;
   --accent:#F79445;  --accent-bright:#F79445; --accent-ink:#14252B;
-  --panel:#E7EFF2;   --panel-ink:#16323C; --panel-dim:#55686F; --panel-rule:#6F838C;
   --focus:#F79445;
+  --st-bg:#0B1A20;   --st-bg-2:#10262E;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -47,55 +49,220 @@ img{max-width:100%; display:block}
 :where(a,button,input,[tabindex]):focus-visible{
   outline:2px solid var(--focus); outline-offset:3px; border-radius:1px;
 }
-
-.slab{font-family:'Zilla Slab',Georgia,serif; font-weight:700; line-height:1.02}
 .mono{font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums}
 .eyebrow{
   font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px;
   letter-spacing:.16em; text-transform:uppercase; color:var(--ink-dim);
 }
-.todo{
-  color:var(--accent); font-family:'IBM Plex Mono',ui-monospace,monospace;
-  font-size:.82em; letter-spacing:.04em; border:1px dashed currentColor;
-  padding:.1em .45em; border-radius:2px; white-space:nowrap;
-}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 
 /* ── CONTACT BAR ─────────────────────────────────────────────────────── */
+:root{--bar-h:56px}
 .bar{
-  position:sticky; top:0; z-index:40; display:flex; gap:1px;
-  background:var(--rule); border-bottom:1px solid var(--rule);
+  position:sticky; top:0; z-index:40; height:var(--bar-h);
+  display:flex; align-items:center; gap:.5rem;
+  padding:0 clamp(1rem,3vw,2rem);
+  background:var(--st-bg); background:color-mix(in srgb, var(--st-bg) 88%, transparent);
+  -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  color:var(--st-ink); border-bottom:1px solid var(--st-rule);
 }
-.bar a{
-  flex:1 1 0; display:flex; align-items:center; justify-content:center; gap:.6em;
-  padding:.85rem 1rem; text-decoration:none; background:var(--ground);
-  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:14px;
-  letter-spacing:.08em; text-transform:uppercase;
+.bar .brand{
+  margin-right:auto; text-decoration:none; display:flex; align-items:baseline; gap:.6rem;
+  font-family:'Zilla Slab',Georgia,serif; font-weight:700; font-size:1.2rem; letter-spacing:-.01em;
 }
-.bar a.is-primary{background:var(--accent); color:var(--accent-ink); font-weight:600}
-.bar .num{letter-spacing:.02em; text-transform:none; font-size:15px}
-.bar svg{width:15px; height:15px; flex:none}
+.bar .brand small{
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-weight:400; font-size:11px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--st-dim);
+}
+.bar a.btn{
+  display:inline-flex; align-items:center; gap:.55em; text-decoration:none;
+  padding:.55rem 1rem; border-radius:3px; border:1px solid var(--st-line);
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:13px; letter-spacing:.06em;
+}
+.bar a.btn.is-primary{background:var(--st-accent); color:var(--st-accent-ink); border-color:var(--st-accent); font-weight:600}
+.bar a.btn svg{width:14px; height:14px; flex:none}
 
-/* ── HERO ─────────────────────────────────────────────────────────────── */
-.hero{overflow-x:clip; padding:clamp(3rem,9vw,7rem) 0 clamp(2.5rem,6vw,4.5rem)}
-.hero-in{max-width:1180px; margin:0 auto; padding:0 clamp(1.25rem,4vw,3rem)}
-.hero h1{
-  font-family:'Zilla Slab',Georgia,serif; font-weight:700; line-height:.98;
-  font-size:clamp(2.9rem,8.4vw,6.2rem); letter-spacing:-.015em;
-  margin:1.1rem 0 0; max-width:15ch; text-wrap:balance;
+/* ══ THE TOUR ═══════════════════════════════════════════════════════════
+   One pinned stage (the car), and a column of steps that scroll past it.
+   Each step tells the stage which part of the car to look at.
+   Desktop: stage fills the viewport; steps scroll in the left 44%.
+   Phone:   stage is the top ~46% of the screen; steps scroll under it.
+   ------------------------------------------------------------------ */
+:root{--stage-h:calc(100svh - var(--bar-h))}
+.tour{position:relative; background:var(--st-bg); color:var(--st-ink); isolation:isolate}
+.stage{
+  position:sticky; top:var(--bar-h); height:var(--stage-h); z-index:1; overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 70% 45%, var(--st-bg-2) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, var(--st-grid) 0 1px, transparent 1px 64px),
+    repeating-linear-gradient(90deg, var(--st-grid) 0 1px, transparent 1px 64px),
+    var(--st-bg);
 }
-.hero h1 em{font-style:normal; color:var(--accent)}
-.hero p{margin:1.6rem 0 0; max-width:46ch; font-size:clamp(1.02rem,1.6vw,1.22rem); color:var(--ink-dim)}
-.plate{margin-top:clamp(2.5rem,5vw,3.5rem)}
-.plate-num{
-  display:block; font-family:'IBM Plex Mono',ui-monospace,monospace; font-weight:600;
-  font-size:clamp(2.7rem,calc(12.6vw - .9rem),9.5rem); line-height:1.08;
-  letter-spacing:-.045em; color:var(--accent); white-space:nowrap;
-  text-decoration:none; font-variant-numeric:tabular-nums;
+.stage::before{ /* vignette */
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(90% 80% at 50% 50%, transparent 55%, rgba(0,0,0,.35) 100%);
 }
-/* The parens overflow the line box at display sizes, so the rule below needs
-   real clearance — at line-height .9 the glyphs sat straight on top of it. */
-.plate-rule{display:flex; align-items:center; gap:1rem; margin-top:2rem; flex-wrap:wrap}
-.plate-rule .line{flex:1 1 60px; height:1px; background:var(--rule)}
+.car-area{position:absolute; inset:0; left:44%; display:grid; place-items:center; padding:0 clamp(1rem,3vw,3rem)}
+.car-box{width:100%; max-width:1100px; aspect-ratio:5/2; position:relative}
+.car{
+  width:100%; height:100%; display:block; overflow:visible;
+  transform-origin:0 0; will-change:transform;
+  transition:transform 1.15s cubic-bezier(.22,.75,.2,1);
+}
+
+/* ── the drawing. Every stroke keeps its pixel width under zoom. ─────── */
+.car *{vector-effect:non-scaling-stroke}
+.car text{font-family:'IBM Plex Mono',ui-monospace,monospace; letter-spacing:.12em; text-transform:uppercase;
+  font-size:calc(var(--co-fs,11px) * var(--inv,1)); transition:font-size 1.15s cubic-bezier(.22,.75,.2,1)}
+.car .road{stroke:var(--st-line); stroke-width:1}
+.car .tick{stroke:var(--st-line); stroke-width:1; opacity:.6}
+.car .dim{stroke:var(--st-dim); stroke-width:1; opacity:.7}
+.car .dim-t{fill:var(--st-dim); opacity:.8}
+.car .body{fill:none; stroke:var(--st-ink); stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
+.car .seam{fill:none; stroke:var(--st-dim); stroke-width:1.25; stroke-linecap:round}
+.car .glass{fill:rgba(241,236,224,.07); stroke:var(--st-dim); stroke-width:1.25; stroke-linejoin:round}
+.car .lamp{fill:rgba(247,148,69,.14); stroke:var(--st-dim); stroke-width:1.25; stroke-linejoin:round}
+.car .tyre{fill:none; stroke:var(--st-ink); stroke-width:2.25}
+.car .rim{fill:none; stroke:var(--st-dim); stroke-width:1.25}
+.car .spoke{stroke:var(--st-dim); stroke-width:1.25; stroke-linecap:round}
+.car .hub{fill:var(--st-bg); stroke:var(--st-dim); stroke-width:1.25}
+.car .in{fill:none; stroke:var(--st-ink); stroke-width:1.4; stroke-linejoin:round; stroke-linecap:round}
+.car .in-dim{fill:none; stroke:var(--st-dim); stroke-width:1; stroke-linecap:round}
+.car .in-fill{fill:rgba(241,236,224,.06); stroke:var(--st-ink); stroke-width:1.4; stroke-linejoin:round}
+.car .in-dash{fill:none; stroke:var(--st-accent); stroke-width:1.25; stroke-dasharray:4 4; stroke-linecap:round}
+.car .in-acc{fill:none; stroke:var(--st-accent); stroke-width:1.6; stroke-linejoin:round; stroke-linecap:round}
+.car .in-acc-fill{fill:rgba(247,148,69,.16); stroke:var(--st-accent); stroke-width:1.4; stroke-linejoin:round}
+.car .hatch{fill:url(#hatch); stroke:none}
+.car .node{fill:var(--st-accent); stroke:none}
+.car .co-line{fill:none; stroke:var(--st-accent); stroke-width:1.1}
+.car .co-dot{fill:var(--st-accent)}
+.car .co-ring{fill:none; stroke:var(--st-accent); stroke-width:1}
+.car .co-t{fill:var(--st-ink); font-weight:500}
+.car .co-n{fill:var(--st-accent); font-weight:600}
+.wheel{transform-box:fill-box; transform-origin:center}
+
+/* Parts are hidden until their step is reached; the body goes to an
+   x-ray when any part is lit, so the internals read clearly. */
+.part,.co{opacity:0; transition:opacity .7s ease .15s}
+.stage[data-focus] .part.is-on,.stage[data-focus] .co.is-on{opacity:1; transition:opacity .8s ease .45s}
+.shell,.wheel{transition:opacity .6s ease}
+.stage.is-xray .shell{opacity:.42}
+.stage.is-xray .wheel{opacity:.16}
+.stage[data-focus="wheels"] .wheel{opacity:.55}
+.stage.is-xray .fade{opacity:0}
+
+/* ── steps (the words) ───────────────────────────────────────────────── */
+.steps{position:relative; z-index:2; margin-top:calc(-1 * var(--stage-h)); width:44%; pointer-events:none}
+.step{
+  min-height:var(--stage-h); display:flex; align-items:center;
+  padding:clamp(2rem,4vh,4rem) clamp(1rem,3vw,2rem) clamp(2rem,4vh,4rem) clamp(1.25rem,4vw,4rem);
+  container-type:inline-size;
+}
+.step > div{pointer-events:auto; max-width:34rem}
+.step .k{
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--st-dim); display:flex; align-items:center; gap:.8rem;
+}
+.step .k b{color:var(--st-accent); font-weight:600}
+.step .k > *{white-space:nowrap}
+.step .k::after{content:""; flex:0 0 40px; height:1px; background:var(--st-line)}
+.step h2,.step h1{
+  font-family:'Zilla Slab',Georgia,serif; font-weight:700; line-height:1.02; letter-spacing:-.015em;
+  text-wrap:balance; margin-top:.9rem;
+}
+.step h2{font-size:clamp(2rem,4.4vw,3.6rem)}
+.step h1{font-size:clamp(2.8rem,11cqw,5.4rem); line-height:.98; max-width:12ch}
+.step h1 em{font-style:normal; color:var(--st-accent)}
+.step p{margin-top:1.1rem; color:var(--st-dim); font-size:clamp(1rem,1.3vw,1.12rem); max-width:40ch}
+.step p b{color:var(--st-ink); font-weight:500}
+.chips{display:flex; flex-wrap:wrap; gap:.45rem; margin-top:1.4rem}
+.chips li{
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; letter-spacing:.04em;
+  padding:.35rem .6rem; border:1px solid var(--st-line); border-radius:2px; color:var(--st-ink);
+}
+.chips li i{font-style:normal; color:var(--st-dim); margin-left:.5em}
+
+/* step reveal: resting state is visible; .pre hides, observer removes */
+.step > div{transition:opacity .7s ease, translate .7s cubic-bezier(.2,.7,.3,1)}
+.step > div.pre{opacity:0; translate:0 22px}
+
+/* hero step */
+.step.is-hero .num{
+  display:inline-block; margin-top:1.6rem; text-decoration:none; color:var(--st-accent);
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-weight:600; letter-spacing:-.04em;
+  font-size:clamp(2rem,9.2cqw,4.6rem); line-height:1.05; white-space:nowrap; font-variant-numeric:tabular-nums;
+}
+.step.is-hero .sub{margin-top:.4rem; display:flex; align-items:center; gap:.9rem; flex-wrap:wrap}
+.step.is-hero .sub .eyebrow{color:var(--st-dim)}
+.step.is-hero .sub .line{flex:1 1 40px; max-width:120px; height:1px; background:var(--st-line)}
+.cue{
+  margin-top:clamp(1.6rem,4vh,3rem); display:inline-flex; align-items:center; gap:.7rem;
+  color:var(--st-dim); font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  transition:opacity .5s ease;
+}
+.cue svg{width:14px; height:14px; animation:cue 1.8s ease-in-out infinite}
+@keyframes cue{0%,100%{translate:0 0}50%{translate:0 5px}}
+html.scrolled .cue{opacity:0}
+
+/* final step */
+.step.is-end .num{
+  display:inline-block; margin-top:1.4rem; text-decoration:none; color:var(--st-accent);
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-weight:600; letter-spacing:-.04em;
+  font-size:clamp(1.8rem,8cqw,3.6rem); line-height:1.1; white-space:nowrap;
+}
+.step.is-end .acts{display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1.2rem}
+.step.is-end .acts a{
+  text-decoration:none; padding:.7rem 1.1rem; border-radius:3px; border:1px solid var(--st-line);
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:13px; letter-spacing:.06em;
+}
+.step.is-end .acts a.is-primary{background:var(--st-accent); color:var(--st-accent-ink); border-color:var(--st-accent); font-weight:600}
+
+/* ── rail: where you are in the tour (desktop) ───────────────────────── */
+.rail{
+  position:absolute; right:clamp(.75rem,2vw,1.75rem); top:50%; translate:0 -50%; z-index:3;
+  display:flex; flex-direction:column; gap:.1rem;
+}
+.rail button{
+  all:unset; cursor:pointer; display:grid; grid-template-columns:1.6rem auto; align-items:center; gap:.6rem;
+  padding:.35rem .4rem; border-radius:2px; color:var(--st-dim);
+  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  transition:color .3s ease;
+}
+.rail button::before{content:""; height:1px; width:1rem; background:currentColor; transition:width .3s ease, background .3s ease}
+.rail button.is-on{color:var(--st-ink)}
+.rail button.is-on::before{width:1.6rem; background:var(--st-accent)}
+.rail button:focus-visible{outline:2px solid var(--st-accent); outline-offset:2px}
+.rail span{opacity:0; translate:-4px 0; transition:opacity .3s ease, translate .3s ease;
+  background:var(--st-bg); padding:.15rem .4rem; border-radius:2px}
+.rail button.is-on span,.rail:hover span{opacity:1; translate:0 0}
+
+/* ── progress bar at stage bottom (phone) ───────────────────────────── */
+.prog{position:absolute; left:0; right:0; bottom:0; height:2px; background:var(--st-rule); display:none}
+.prog i{display:block; height:100%; width:0; background:var(--st-accent); transition:width .5s ease}
+
+/* fade into the light page */
+.tour::after{content:""; display:block; height:1px; background:var(--st-rule)}
+
+@media (max-width:899px){
+  :root{--stage-h:42svh; --co-fs:9.5px}
+  .stage{top:0; z-index:2}
+  .stage::after{
+    content:""; position:absolute; left:0; right:0; bottom:-1px; height:28px; pointer-events:none;
+    background:linear-gradient(to bottom, transparent, var(--st-bg));
+    translate:0 100%;
+  }
+  .car-area{left:0; padding:1.25rem 1rem 1.5rem}
+  .car-box{max-width:560px}
+  .steps{margin-top:0; width:100%; z-index:1}
+  .step{min-height:54svh; align-items:flex-start;
+        padding:clamp(1.75rem,4svh,2.5rem) clamp(1.1rem,4vw,2rem) clamp(2.5rem,7svh,4rem)}
+  .step.is-hero,.step.is-end{min-height:calc(100svh - var(--stage-h) - 4.5rem)}
+  .step:last-child{padding-bottom:clamp(3rem,8svh,5rem)}
+  .step h1{font-size:clamp(2.4rem,11cqw,3.6rem)}
+  .step h2{font-size:clamp(1.9rem,8cqw,2.6rem)}
+  .rail{display:none}
+  .prog{display:block}
+}
 
 /* ── SECTION FURNITURE ───────────────────────────────────────────────── */
 .wrap{max-width:1180px; margin:0 auto; padding-inline:clamp(1.25rem,4vw,3rem)}
@@ -108,55 +275,15 @@ img{max-width:100%; display:block}
 .head p{color:var(--ink-dim); max-width:52ch}
 .hr{height:2px; background:var(--ink); transform-origin:left center; margin-bottom:1.4rem}
 
-/* ── DIAGRAM ─────────────────────────────────────────────────────────── */
-.diagram{padding:clamp(3rem,7vw,5.5rem) 0; border-top:1px solid var(--rule)}
-.diagram .head{padding-inline:clamp(1.25rem,4vw,3rem); max-width:1180px; margin:0 auto}
-.rig{
-  margin-top:clamp(2rem,4vw,3rem); display:grid; gap:clamp(1.5rem,3vw,2.5rem);
-  grid-template-columns:1fr; align-items:start;
-  max-width:1180px; margin-inline:auto; padding-inline:clamp(1.25rem,4vw,3rem);
-}
-@media (min-width:900px){ .rig{grid-template-columns:minmax(0,1fr) 336px} }
-
-.plan{width:100%; height:auto; display:block; touch-action:manipulation}
-.plan .sheet{fill:none; stroke:var(--rule); stroke-width:1}
-.plan .body{fill:none; stroke:var(--ink); stroke-width:2.25; stroke-linejoin:round; stroke-linecap:round}
-.plan .detail{fill:none; stroke:var(--ink-dim); stroke-width:1.5; stroke-linecap:round}
-.plan .glass{fill:var(--raised); stroke:var(--ink-dim); stroke-width:1.25}
-.plan .tyre{fill:none; stroke:var(--ink); stroke-width:2.25}
-.plan .hub{fill:none; stroke:var(--ink-dim); stroke-width:1.5}
-.plan .spoke{stroke:var(--ink-dim); stroke-width:1.5; stroke-linecap:round}
-.wheel{transform-box:fill-box; transform-origin:center}
-
-.zone{cursor:pointer; -webkit-tap-highlight-color:transparent}
-.zone .hit{fill:transparent; stroke:none}
-.zone .wash{fill:var(--accent-bright); opacity:0; transition:opacity .18s ease}
-.zone .pin{fill:var(--ground); stroke:var(--ink-dim); stroke-width:1.5; transition:fill .18s ease,stroke .18s ease}
-.zone .pin-n{
-  font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:15px; font-weight:600;
-  fill:var(--ink-dim); text-anchor:middle; dominant-baseline:central;
-  transition:fill .18s ease; pointer-events:none;
-}
-.zone:hover .pin{stroke:var(--accent)}
-.zone:hover .pin-n{fill:var(--accent)}
-.zone[aria-checked="true"] .wash{opacity:.18}
-.zone[aria-checked="true"] .pin{fill:var(--accent); stroke:var(--accent)}
-.zone[aria-checked="true"] .pin-n{fill:var(--accent-ink)}
-.zone:focus{outline:none}
-.zone:focus-visible .pin{stroke:var(--focus); stroke-width:3}
-
-.rail{border-top:2px solid var(--ink)}
-.rail-h{display:flex; align-items:baseline; justify-content:space-between; gap:1rem; padding:.7rem 0 .9rem}
-.rail-h .n{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:13px; color:var(--accent); letter-spacing:.1em}
-.rail-h .t{font-family:'Zilla Slab',Georgia,serif; font-weight:700; font-size:1.18rem; line-height:1.15}
-.ops{border-top:1px solid var(--rule)}
-.ops li{display:grid; grid-template-columns:2.6rem 1fr auto; gap:.75rem;
-        align-items:baseline; padding:.6rem .2rem; border-bottom:1px solid var(--rule)}
-.ops .idx{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12.5px; color:var(--ink-dim)}
-.ops .op{font-size:15px}
-.ops .kind{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11.5px;
-           letter-spacing:.09em; text-transform:uppercase; color:var(--ink-dim); white-space:nowrap}
-.rail-foot{padding:.9rem 0 0; font-size:13.5px; color:var(--ink-dim)}
+/* ── HOW A VISIT GOES ────────────────────────────────────────────────── */
+.how{padding:clamp(3rem,7vw,5.5rem) 0}
+.how-grid{margin-top:2.6rem; display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule)}
+@media (min-width:720px){ .how-grid{grid-template-columns:repeat(3,1fr)} }
+.how-grid > div{background:var(--ground); padding:1.6rem 1.5rem 1.8rem}
+.how-grid .k{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; letter-spacing:.14em; color:var(--accent)}
+.how-grid h3{font-family:'Zilla Slab',Georgia,serif; font-weight:700; font-size:1.45rem; line-height:1.15; margin-top:.9rem}
+.how-grid p{margin-top:.6rem; color:var(--ink-dim); font-size:15.5px}
+.how-grid svg{width:34px; height:34px; stroke:var(--ink); fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; margin-top:1.2rem}
 
 /* ── FULL SERVICE INDEX ──────────────────────────────────────────────── */
 .index{padding:clamp(3rem,7vw,5.5rem) 0; border-top:1px solid var(--rule)}
@@ -170,41 +297,24 @@ img{max-width:100%; display:block}
 .grp li{font-size:15px; padding:.22rem 0; color:var(--ink-dim)}
 .grp li b{font-weight:400; color:var(--ink)}
 
-/* ── GALLERY — the rhythm break: full bleed, inverted ────────────────── */
-.gallery{background:var(--panel); color:var(--panel-ink); padding:clamp(3rem,7vw,5.5rem) 0}
-.gallery .eyebrow{color:var(--panel-dim)}
-.gallery h2{
-  font-family:'Zilla Slab',Georgia,serif; font-weight:700; line-height:1.04;
-  font-size:clamp(1.85rem,4.2vw,3rem); letter-spacing:-.012em; text-wrap:balance;
-}
-.gallery .lede{color:var(--panel-dim); max-width:52ch; margin-top:.7rem}
-.shots{
-  margin-top:2.6rem; display:grid; gap:clamp(.75rem,1.6vw,1.1rem);
-  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-}
-.shot{position:relative; aspect-ratio:4/3; overflow:hidden; background:rgba(128,128,128,.08)}
+/* ── GALLERY — only rendered once a real photo exists ───────────────── */
+.gallery{display:none; background:var(--ink); color:var(--ground); padding:clamp(3rem,7vw,5.5rem) 0}
+.gallery.has-photos{display:block}
+.gallery h2{font-family:'Zilla Slab',Georgia,serif; font-weight:700; line-height:1.04; font-size:clamp(1.85rem,4.2vw,3rem)}
+.shots{margin-top:2.6rem; display:grid; gap:clamp(.75rem,1.6vw,1.1rem); grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.shot{aspect-ratio:4/3; overflow:hidden; background:rgba(128,128,128,.08)}
 .shot img{width:100%; height:100%; object-fit:cover}
-.slot{
-  position:absolute; inset:0; border:1.5px dashed var(--panel-rule);
-  display:flex; flex-direction:column; justify-content:space-between;
-  padding:.9rem 1rem; gap:.5rem;
-}
-.slot .sn{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11.5px;
-          letter-spacing:.12em; color:var(--panel-dim)}
-.slot .sw{font-size:14.5px; line-height:1.35; color:var(--panel-ink)}
-.cap{margin-top:.55rem; font-size:13.5px; color:var(--panel-dim)}
-.gallery .foot-note{margin-top:2rem; font-size:13.5px; color:var(--panel-dim); max-width:58ch}
+.shot{transition:opacity .7s ease, translate .7s cubic-bezier(.2,.7,.3,1)}
+.shot.pre{opacity:0; translate:0 16px}
 
 /* ── WHAT TO TELL HIM ────────────────────────────────────────────────── */
-.send{padding:clamp(3rem,7vw,5.5rem) 0}
-.steps{margin-top:2.4rem; display:flex; flex-direction:column}
-.steps li{display:grid; grid-template-columns:3.2rem 1fr; gap:1rem;
-          padding:1.15rem 0; border-top:1px solid var(--rule)}
-.steps li:last-child{border-bottom:1px solid var(--rule)}
-.steps .k{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:13px;
-          color:var(--accent); letter-spacing:.08em; padding-top:.25rem}
-.steps h3{font-family:'Zilla Slab',Georgia,serif; font-weight:700; font-size:1.24rem; line-height:1.2}
-.steps p{color:var(--ink-dim); margin-top:.25rem; font-size:15.5px; max-width:56ch}
+.send{padding:clamp(3rem,7vw,5.5rem) 0; border-top:1px solid var(--rule)}
+.send-steps{margin-top:2.4rem; display:flex; flex-direction:column}
+.send-steps li{display:grid; grid-template-columns:3.2rem 1fr; gap:1rem; padding:1.15rem 0; border-top:1px solid var(--rule)}
+.send-steps li:last-child{border-bottom:1px solid var(--rule)}
+.send-steps .k{font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:13px; color:var(--accent); letter-spacing:.08em; padding-top:.25rem}
+.send-steps h3{font-family:'Zilla Slab',Georgia,serif; font-weight:700; font-size:1.24rem; line-height:1.2}
+.send-steps p{color:var(--ink-dim); margin-top:.25rem; font-size:15.5px; max-width:56ch}
 
 /* ── FOOTER ──────────────────────────────────────────────────────────── */
 .foot{padding:clamp(2.5rem,5vw,4rem) 0 3rem; border-top:1px solid var(--rule)}
@@ -215,147 +325,277 @@ img{max-width:100%; display:block}
 }
 .foot-meta{margin-top:1.4rem; display:flex; flex-wrap:wrap; gap:.6rem 2rem; font-size:14px; color:var(--ink-dim)}
 .foot-meta b{font-weight:600; color:var(--ink)}
+.foot-meta:empty{display:none}
 .foot-fine{margin-top:1.6rem; font-size:13px; color:var(--ink-dim); max-width:60ch}
 
 @media (max-width:640px){
-  /* left/right are required: a fixed element without them shrinks to fit its
-     content instead of spanning the screen. */
-  .bar{position:fixed; top:auto; bottom:0; left:0; right:0;
-       border-bottom:0; border-top:1px solid var(--rule)}
-  .bar a{font-size:13px}
-  .foot{padding-bottom:calc(5.5rem + env(safe-area-inset-bottom,0px))}
-  .bar a{padding-bottom:calc(.85rem + env(safe-area-inset-bottom,0px))}
+  .bar{position:fixed; top:auto; bottom:0; left:0; right:0; border-bottom:0; border-top:1px solid var(--st-rule); gap:.5rem}
+  .bar .brand{display:none}
+  .bar a.btn{justify-content:center; padding:.8rem .7rem; white-space:nowrap; font-size:12.5px}
+  .bar a.btn.is-primary{flex:1 1 auto}
+  .bar a.btn:not(.is-primary){flex:0 1 auto; min-width:5.5rem}
+  .bar{height:auto; padding-bottom:calc(.5rem + env(safe-area-inset-bottom,0px)); padding-top:.5rem}
+  .foot{padding-bottom:calc(6rem + env(safe-area-inset-bottom,0px))}
 }
+@media (min-width:641px) and (max-width:899px){ .bar{position:fixed; top:0; left:0; right:0} .tour{padding-top:var(--bar-h)} }
 
 /* ══ MOTION ════════════════════════════════════════════════════════════
-   Two mechanisms, split by what each is actually good at — and by how bad
-   it is when one fails.
-
-   1  REVEALS decide whether content is VISIBLE, so they must never depend
-      on a scroll timeline resolving. They run on IntersectionObserver plus
-      plain transitions. The resting state below is fully visible; script
-      adds .pre to hide, the observer removes it on entry, and a timeout
-      clears it regardless. No script, no observer, a stalled timeline, a
-      printer — the page still shows everything.
-
-   2  CONTINUOUS effects run on scroll-driven CSS, which is genuinely
-      better at them and stays off the main thread. Neither one can hide
-      anything: if the timeline never resolves, the number just sits still.
-
-   Five moments, spread apart rather than one uniform fade-up per section:
-   the blueprint draws itself, the wheels turn as it arrives, the number
-   drifts against the scroll, section rules stroke across, and each photo
-   settles on its own arrival.
+   Reveals (whether content is visible) run on IntersectionObserver plus
+   transitions, with the resting state VISIBLE. Continuous effects — the
+   wheels turning with the scroll — use CSS scroll-driven animation and
+   can never hide anything. Everything is off under reduced motion.
    ------------------------------------------------------------------ */
-
-/* 1 — reveals. Resting state is VISIBLE; .pre is the hidden state. */
-.plan .body,.plan .detail{stroke-dasharray:1; stroke-dashoffset:0;
-  transition:stroke-dashoffset 1.5s cubic-bezier(.6,0,.3,1)}
-.plan .body.pre,.plan .detail.pre{stroke-dashoffset:1}
-.plan .detail{transition-delay:.4s}
-.plan .glass,.plan .tyre,.plan .hub,.plan .spoke{opacity:1; transition:opacity .8s ease .65s}
-.plan .glass.pre,.plan .tyre.pre,.plan .hub.pre,.plan .spoke.pre{opacity:0}
-.zone .pin,.zone .pin-n{transition:opacity .5s ease 1.05s}
-.zone .pin.pre,.zone .pin-n.pre{opacity:0}
-.shot{transition:opacity .7s ease, translate .7s cubic-bezier(.2,.7,.3,1)}
-.shot.pre{opacity:0; translate:0 16px}
 .hr{transition:scale .9s cubic-bezier(.2,.7,.3,1)}
 .hr.pre{scale:0 1}
 
-/* 2 — continuous. Cannot gate visibility, so a stalled timeline is harmless. */
-@supports (animation-timeline:view()){
+/* arrival: the car rolls in from the right on load */
+@keyframes drive{from{translate:640px 0} to{translate:0 0}}
+@keyframes spin {from{rotate:-540deg} to{rotate:0deg}}
+html.arrive .rig{animation:drive 1.7s cubic-bezier(.16,.84,.24,1) both}
+html.arrive .wheel-in{animation:spin 1.7s cubic-bezier(.16,.84,.24,1) both}
+.wheel-in{transform-box:fill-box; transform-origin:center}
+
+@supports (animation-timeline:scroll()){
   @media (prefers-reduced-motion:no-preference){
-    .plate-num{animation:drift linear both; animation-timeline:scroll(root); animation-range:0 70vh}
-    .wheel{animation:roll linear both; animation-timeline:view(); animation-range:entry 10% cover 75%}
+    .wheel{animation:roll linear both; animation-timeline:scroll(root)}
   }
 }
-@keyframes drift { to { translate:0 34px } }
-@keyframes roll  { from { rotate:-160deg } to { rotate:0deg } }
+@keyframes roll{to{rotate:1800deg}}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none !important; transition:none !important}
   html{scroll-behavior:auto}
-  .pre{stroke-dashoffset:0 !important; opacity:1 !important;
-       translate:none !important; scale:none !important}
+  .pre{opacity:1 !important; translate:none !important; scale:none !important}
 }
 </style>
 
-<!-- ══ CONTACT ═════════════════════════════════════════════════════════ -->
+<!-- ══ CONTACT BAR ═════════════════════════════════════════════════════ -->
 <nav class="bar" aria-label="Contact Joe">
-  <a href="#" data-tel class="is-primary">
+  <a class="brand" href="#top">Joe <small>Mobile auto repair</small></a>
+  <a href="#" data-sms class="btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Text
+  </a>
+  <a href="#" data-tel class="btn is-primary">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
-    Call <span class="num" data-display></span>
+    Call <span data-display></span>
   </a>
 </nav>
 
-<!-- ══ HERO ════════════════════════════════════════════════════════════ -->
-<header class="hero">
-  <div class="hero-in">
-    <p class="eyebrow">Mobile auto repair &middot; <span data-area></span></p>
-    <h1>No shop.<br>Joe drives to <em>your</em> car.</h1>
-    <p>Oil changes to engine swaps, brake jobs to a full respray. The work happens
-       wherever the car is sitting &mdash; your driveway, your street, your work lot.</p>
-    <div class="plate">
-      <a class="plate-num" href="#" data-tel data-display-big></a>
-      <div class="plate-rule">
-        <span class="eyebrow">Call it or text it</span>
-        <span class="line"></span>
-        <span class="eyebrow" data-hours></span>
+<!-- ══ THE TOUR ════════════════════════════════════════════════════════ -->
+<section class="tour" id="top" aria-label="What Joe works on, part by part">
+  <div class="stage" id="stage">
+    <div class="car-area">
+      <div class="car-box" id="car-box">
+        <svg class="car" id="car" viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="Technical side-view drawing of a car. Scrolling moves between its areas.">
+          <defs>
+            <pattern id="hatch" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="7" stroke="#F79445" stroke-width="1" opacity=".55"/>
+            </pattern>
+          </defs>
+
+          <!-- ground + drawing furniture -->
+          <g class="fade" aria-hidden="true">
+            <line class="road" x1="20" y1="352" x2="980" y2="352"/>
+            <g class="tick">
+              <line x1="20" y1="352" x2="20" y2="360"/><line x1="500" y1="352" x2="500" y2="358"/><line x1="980" y1="352" x2="980" y2="360"/>
+            </g>
+            <line class="dim" x1="90" y1="378" x2="928" y2="378"/>
+            <line class="dim" x1="90" y1="372" x2="90" y2="384"/><line class="dim" x1="928" y1="372" x2="928" y2="384"/>
+            <text class="dim-t" x="500" y="394" text-anchor="middle">Fig. 1 — side elevation — not to scale</text>
+          </g>
+
+          <g class="rig" id="rig">
+            <!-- ── shell ─────────────────────────────────────────────── -->
+            <g class="shell" aria-hidden="true">
+              <path class="body draw" d="M92 288 L86 268 Q84 248 94 236 L112 226 Q180 215 302 212 L334 208 Q376 160 424 148 Q504 136 598 138 Q646 142 702 198 L712 206 Q792 212 862 222 Q900 228 918 246 L928 262 Q934 280 926 288 L832 288 A72 72 0 0 0 688 288 L322 288 A72 72 0 0 0 178 288 Z"/>
+              <!-- glass -->
+              <polygon class="glass draw" points="318,210 396,156 412,158 352,210"/>
+              <polygon class="glass draw" points="362,208 428,154 484,152 484,208"/>
+              <polygon class="glass draw" points="496,152 592,150 646,208 496,208"/>
+              <polygon class="glass draw" points="604,150 622,152 700,206 662,206"/>
+              <!-- seams, handles, mirror, lamps, sill -->
+              <path class="seam draw" d="M352 210 Q346 250 350 288"/>
+              <path class="seam draw" d="M488 152 V288"/>
+              <path class="seam draw" d="M652 210 Q646 250 650 288"/>
+              <path class="seam draw" d="M712 206 Q716 250 714 288"/>
+              <path class="seam draw" d="M120 272 Q500 262 900 266"/>
+              <path class="seam draw" d="M438 228 H462 M566 226 H590"/>
+              <rect class="seam draw" x="152" y="234" width="16" height="12" rx="2"/>
+              <path class="seam draw" d="M600 164 h14 v10 h-14 z"/>
+              <polygon class="lamp draw" points="86,240 110,236 112,258 90,262"/>
+              <polygon class="lamp draw" points="886,232 922,248 918,264 884,256"/>
+              <path class="seam draw" d="M94 304 h14"/>
+            </g>
+
+            <!-- ── wheels ────────────────────────────────────────────── -->
+            <g class="wheel" aria-hidden="true"><g class="wheel-in">
+              <circle class="tyre draw" cx="250" cy="290" r="56"/>
+              <circle class="rim draw" cx="250" cy="290" r="38"/>
+              <path class="spoke draw" d="M250 278 V254 M261.4 286.3 L284.2 278.9 M257.1 299.7 L271.2 319.1 M242.9 299.7 L228.8 319.1 M238.6 286.3 L215.8 278.9"/>
+              <circle class="hub draw" cx="250" cy="290" r="12"/>
+            </g></g>
+            <g class="wheel" aria-hidden="true"><g class="wheel-in">
+              <circle class="tyre draw" cx="760" cy="290" r="56"/>
+              <circle class="rim draw" cx="760" cy="290" r="38"/>
+              <path class="spoke draw" d="M760 278 V254 M771.4 286.3 L794.2 278.9 M767.1 299.7 L781.2 319.1 M752.9 299.7 L738.8 319.1 M748.6 286.3 L725.8 278.9"/>
+              <circle class="hub draw" cx="760" cy="290" r="12"/>
+            </g></g>
+
+            <!-- ── 01 engine bay ────────────────────────────────────── -->
+            <g class="part" data-part="engine" aria-hidden="true">
+              <rect class="in-fill" x="744" y="240" width="76" height="44" rx="4"/>
+              <rect class="in" x="748" y="230" width="68" height="10" rx="2"/>
+              <path class="in-dim" d="M756 240 V284 M770 240 V284 M784 240 V284 M798 240 V284"/>
+              <circle class="in" cx="735" cy="250" r="8"/><circle class="in" cx="735" cy="273" r="11"/>
+              <path class="in-acc" d="M727 250 V273 M743 250 V273"/>
+              <rect class="in" x="828" y="232" width="28" height="18" rx="2"/>
+              <path class="in-acc" d="M834 238 h6 M837 235 v6 M846 238 h6"/>
+              <rect class="in" x="866" y="236" width="10" height="46" rx="1"/>
+              <path class="in-dim" d="M866 244 h10 M866 252 h10 M866 260 h10 M866 268 h10 M866 276 h10"/>
+              <path class="in-dim" d="M820 262 H866"/>
+              <path class="in-acc-fill" d="M742 284 h80 v10 h-80 z"/>
+            </g>
+
+            <!-- ── 02 front end ─────────────────────────────────────── -->
+            <g class="part" data-part="front" aria-hidden="true">
+              <path class="in-acc" d="M868 262 H930 L926 288 H868 Z"/>
+              <path class="in" d="M880 270 h22 M882 277 h24 M884 284 h22"/>
+              <circle class="in" cx="916" cy="277" r="4"/>
+              <polygon class="in-acc" points="886,232 922,248 918,264 884,256"/>
+              <path class="in-dash" d="M712 206 Q792 212 862 222"/>
+              <path class="in-dash" d="M832 288 A72 72 0 0 0 688 288"/>
+            </g>
+
+            <!-- ── 03 wheels & brakes (front wheel) ─────────────────── -->
+            <g class="part" data-part="wheels" aria-hidden="true">
+              <circle class="in-acc" cx="760" cy="290" r="30"/>
+              <circle class="in" cx="760" cy="290" r="13"/>
+              <g class="in-dim">
+                <circle cx="760" cy="268" r="2.4"/><circle cx="779" cy="279" r="2.4"/><circle cx="779" cy="301" r="2.4"/>
+                <circle cx="760" cy="312" r="2.4"/><circle cx="741" cy="301" r="2.4"/><circle cx="741" cy="279" r="2.4"/>
+              </g>
+              <path class="in-acc-fill" d="M771.3 259 A33 33 0 0 1 791.9 281.5 L784 283.6 A25 25 0 0 0 768.6 266.6 Z"/>
+              <path class="in-acc" d="M760 290 L760 226"/>
+              <path class="in" d="M750 232 l20 6 l-20 6 l20 6 l-20 6 l20 6"/>
+              <path class="in-dim" d="M760 290 H700 M700 294 v-8"/>
+            </g>
+
+            <!-- ── 04 body & paint ──────────────────────────────────── -->
+            <g class="part" data-part="body" aria-hidden="true">
+              <polygon class="hatch" points="352,212 428,154 486,152 486,286 352,286"/>
+              <path class="in-acc" d="M352 212 L428 154 L486 152 V286 H352 Z"/>
+              <path class="in-dash" d="M112 226 Q180 215 302 212"/>
+              <path class="in-dash" d="M652 210 Q646 250 650 288"/>
+              <path class="in-dash" d="M712 206 Q716 250 714 288"/>
+              <path class="in-dash" d="M94 236 L112 226"/>
+              <path class="in-dim" d="M300 300 H540 M300 296 v8 M540 296 v8"/>
+              <text class="dim-t" x="420" y="314" text-anchor="middle">rear door — refinish</text>
+            </g>
+
+            <!-- ── 05 underneath ────────────────────────────────────── -->
+            <g class="part" data-part="under" aria-hidden="true">
+              <path class="in-acc" d="M772 288 C772 310 760 330 724 330 H650"/>
+              <rect class="in-fill" x="580" y="322" width="70" height="16" rx="8"/>
+              <path class="in-acc" d="M580 330 H440"/>
+              <rect class="in-fill" x="330" y="320" width="110" height="20" rx="9"/>
+              <path class="in-acc" d="M330 330 H108"/>
+              <rect class="in" x="96" y="326" width="14" height="8" rx="2"/>
+              <rect class="in" x="450" y="294" width="110" height="24" rx="7"/>
+              <path class="in-dim" d="M466 294 v24 M544 294 v24"/>
+              <path class="in" d="M700 300 L740 292 M700 300 L676 296"/><circle class="in" cx="700" cy="300" r="4"/>
+              <path class="in" d="M300 300 L260 292 M300 300 L324 296"/><circle class="in" cx="300" cy="300" r="4"/>
+              <path class="in" d="M250 290 V226 M240 232 l20 6 l-20 6 l20 6 l-20 6 l20 6"/>
+              <path class="in" d="M760 290 V226 M750 232 l20 6 l-20 6 l20 6 l-20 6 l20 6"/>
+              <path class="in-dash" d="M742 294 h80"/>
+            </g>
+
+            <!-- ── 06 cabin & electrical ────────────────────────────── -->
+            <g class="part" data-part="cabin" aria-hidden="true">
+              <path class="in" d="M606 212 Q650 206 698 208"/>
+              <ellipse class="in" cx="626" cy="226" rx="5" ry="13" transform="rotate(18 626 226)"/>
+              <path class="in-dim" d="M630 224 L658 212"/>
+              <g transform="rotate(-8 554 258)"><rect class="in" x="548" y="232" width="13" height="50" rx="6"/></g>
+              <rect class="in" x="552" y="268" width="44" height="14" rx="6"/>
+              <g transform="rotate(-8 410 258)"><rect class="in" x="404" y="236" width="13" height="46" rx="6"/></g>
+              <rect class="in" x="408" y="268" width="44" height="14" rx="6"/>
+              <path class="in-dash" d="M716 284 H352"/>
+              <path class="in-dash" d="M440 284 V236 M470 284 V252 M690 284 V214 M672 284 V246"/>
+              <circle class="node" cx="440" cy="236" r="3"/><circle class="node" cx="470" cy="252" r="3"/>
+              <circle class="node" cx="690" cy="214" r="3"/>
+              <circle class="in-acc" cx="672" cy="238" r="8"/>
+              <path class="in-acc" d="M672 238 l5 -5 M672 238 l-6 -2 M672 238 l1 7"/>
+            </g>
+
+            <!-- callouts are generated -->
+            <g class="callouts" id="callouts" aria-hidden="true"></g>
+          </g>
+        </svg>
       </div>
     </div>
-  </div>
-</header>
-
-<!-- ══ DIAGRAM ═════════════════════════════════════════════════════════ -->
-<section class="diagram" aria-labelledby="dg-h">
-  <div class="head">
-    <div class="hr"></div>
-    <p class="eyebrow">Fig. 1 &mdash; What he covers</p>
-    <h2 id="dg-h">Point at what&rsquo;s wrong.</h2>
-    <p>Pick any part of the car and you&rsquo;ll see the work Joe does there.
-       The full list is written out underneath.</p>
+    <ol class="rail" id="rail" aria-label="Jump to an area"></ol>
+    <div class="prog" aria-hidden="true"><i id="prog"></i></div>
   </div>
 
-  <div class="rig">
-    <svg class="plan" viewBox="0 0 1000 400" id="plan"
-         role="group" aria-label="Side view of a car with six selectable areas"
-         xmlns="http://www.w3.org/2000/svg">
-      <g class="sheet" aria-hidden="true">
-        <path d="M40 352 H960"/>
-        <path d="M40 344 V360 M960 344 V360"/>
-      </g>
-      <g aria-hidden="true">
-        <path class="body" pathLength="1" d="M74 254 L78 236 Q84 226 102 223 L306 214 L400 146 Q404 140 414 139
-                               L596 134 Q606 133 613 141 L704 208 L866 223 Q902 227 918 245
-                               L929 259 L932 286 L900 290 L822 290 Q764 178 706 290
-                               L294 290 Q236 178 178 290 L96 290 Q76 288 74 272 Z"/>
-        <path class="glass" d="M476 154 L588 150 L592 202 L476 202 Z"/>
-        <path class="glass" d="M412 158 L462 155 L462 202 L406 202 Z"/>
-        <path class="glass" d="M616 152 L692 204 L610 202 Z"/>
-        <path class="detail" pathLength="1" d="M470 150 V288 M308 210 V288"/>
-        <path class="detail" pathLength="1" d="M500 224 H534 M350 226 H384"/>
-        <path class="detail" pathLength="1" d="M892 232 L920 248 L914 262 L887 250 Z"/>
-        <path class="detail" pathLength="1" d="M78 244 L98 241 L100 258 L80 260 Z"/>
-        <path class="detail" pathLength="1" d="M898 278 L931 276 M74 268 L100 266"/>
-        <g class="wheel">
-          <circle class="tyre" cx="236" cy="294" r="58"/><circle class="hub" cx="236" cy="294" r="30"/>
-          <path class="spoke" d="M236 264 V324 M210 279 L262 309 M210 309 L262 279"/>
-        </g>
-        <g class="wheel">
-          <circle class="tyre" cx="764" cy="294" r="58"/><circle class="hub" cx="764" cy="294" r="30"/>
-          <path class="spoke" d="M764 264 V324 M738 279 L790 309 M738 309 L790 279"/>
-        </g>
-      </g>
-      <g id="zones" role="radiogroup" aria-label="Areas of the car"></g>
-    </svg>
-
-    <div class="rail">
-      <div class="rail-h">
-        <span class="n" id="rail-n">&mdash;</span>
-        <span class="t" id="rail-t">Pick an area</span>
+  <div class="steps" id="steps">
+    <article class="step is-hero" data-focus="all">
+      <div>
+        <p class="k"><b>Mobile auto repair</b> <span data-area-inline></span></p>
+        <h1>No shop.<br>Joe drives to <em>your</em> car.</h1>
+        <p>Oil changes to engine swaps, brake jobs to a full respray. The work happens
+           wherever the car is sitting &mdash; your driveway, your street, your work lot.</p>
+        <a class="num" href="#" data-tel data-display></a>
+        <div class="sub"><span class="eyebrow">Call it or text it</span><span class="line"></span><span class="eyebrow" data-hours-inline></span></div>
+        <div class="cue" aria-hidden="true">Scroll the car
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        </div>
       </div>
-      <ul class="ops" id="ops"></ul>
-      <p class="rail-foot" id="rail-foot">Six areas. All of it happens at your place.</p>
+    </article>
+    <!-- six zone steps are generated from ZONES -->
+    <article class="step is-end" data-focus="end">
+      <div>
+        <p class="k"><b>All six areas</b> <span>at your place</span></p>
+        <h2>No drop-off. No courtesy car. No shop.</h2>
+        <p>He brings the tools to wherever the car is sitting and does the work there.
+           Tell him what it&rsquo;s doing and where it is, and he&rsquo;ll tell you what it needs.</p>
+        <a class="num" href="#" data-tel data-display></a>
+        <div class="acts">
+          <a href="#" data-tel class="is-primary">Call Joe</a>
+          <a href="#" data-sms>Send a text</a>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ══ HOW A VISIT GOES ════════════════════════════════════════════════ -->
+<section class="how" aria-labelledby="hw-h">
+  <div class="wrap">
+    <div class="head">
+      <div class="hr"></div>
+      <p class="eyebrow">Fig. 2 &mdash; How it works</p>
+      <h2 id="hw-h">Three steps, none of them a trip to a garage.</h2>
+    </div>
+    <div class="how-grid">
+      <div>
+        <span class="k">01</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+        <h3>You call or text.</h3>
+        <p>Say what the car is, what it&rsquo;s doing, and where it&rsquo;s parked. He&rsquo;ll tell you what he thinks and what to expect.</p>
+      </div>
+      <div>
+        <span class="k">02</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17h2a2 2 0 1 0 4 0h6a2 2 0 1 0 4 0h2v-5l-3-5H3z"/><path d="M14 7v5h7"/></svg>
+        <h3>He comes to the car.</h3>
+        <p>Tools, parts and fluids arrive with him. The car stays where it is &mdash; no tow, no drop-off, no waiting room.</p>
+      </div>
+      <div>
+        <span class="k">03</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>
+        <h3>It gets fixed there.</h3>
+        <p>Diagnosis first, so you only replace what&rsquo;s worn. Bigger jobs &mdash; an engine, a full respray &mdash; get a proper quote before anything starts.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -365,7 +605,7 @@ img{max-width:100%; display:block}
   <div class="wrap">
     <div class="head">
       <div class="hr"></div>
-      <p class="eyebrow">Fig. 2 &mdash; Everything, written out</p>
+      <p class="eyebrow">Fig. 3 &mdash; Everything, written out</p>
       <h2 id="ix-h">The whole list.</h2>
       <p>If it isn&rsquo;t here, ask him anyway &mdash; this is the common work,
          not the limit of it.</p>
@@ -374,16 +614,12 @@ img{max-width:100%; display:block}
   </div>
 </section>
 
-<!-- ══ GALLERY ═════════════════════════════════════════════════════════ -->
-<section class="gallery" aria-labelledby="gl-h">
+<!-- ══ GALLERY (hidden until photos/ has something in it) ═══════════════ -->
+<section class="gallery" id="gallery" aria-labelledby="gl-h">
   <div class="wrap">
-    <p class="eyebrow">Fig. 3 &mdash; His work</p>
+    <p class="eyebrow">Fig. 4 &mdash; His work</p>
     <h2 id="gl-h">Jobs he&rsquo;s finished.</h2>
-    <p class="lede">Photos go here. Until Joe sends them these stay as marked
-       empty slots &mdash; borrowed pictures of someone else&rsquo;s work would be
-       worth less than nothing.</p>
     <div class="shots" id="shots"></div>
-    <p class="foot-note" id="gallery-note"></p>
   </div>
 </section>
 
@@ -392,11 +628,11 @@ img{max-width:100%; display:block}
   <div class="wrap-tight">
     <div class="head">
       <div class="hr"></div>
-      <p class="eyebrow">Fig. 4 &mdash; Before you ring</p>
+      <p class="eyebrow">Before you ring</p>
       <h2 id="sd-h">Four things worth having ready.</h2>
       <p>The more of this he has up front, the closer his first answer gets to a real number.</p>
     </div>
-    <ol class="steps">
+    <ol class="send-steps">
       <li><span class="k">01</span><div>
         <h3>The car</h3>
         <p>Year, make, model. Engine size too, if you know it &mdash; parts change between trims.</p></div></li>
@@ -418,10 +654,7 @@ img{max-width:100%; display:block}
   <div class="wrap">
     <p class="eyebrow">Joe &mdash; mobile auto repair</p>
     <a class="foot-num" href="#" data-tel data-display></a>
-    <div class="foot-meta">
-      <span>Comes to you &middot; <b data-area></b></span>
-      <span>Hours <b data-hours></b></span>
-    </div>
+    <div class="foot-meta" id="foot-meta"></div>
     <p class="foot-fine">No tracking, no analytics, no database. This page collects nothing.</p>
   </div>
 </footer>
@@ -429,225 +662,260 @@ img{max-width:100%; display:block}
 <script>
 /* ═══════════════════════════════════════════════════════════════════════
    JOE — EDIT THIS BLOCK, NOTHING ELSE.
-   Any value left as CONFIRM_WITH_JOE shows on the page as a dashed
-   "need from Joe" tag, so it can never ship as a made-up fact.
+   `area` and `hours` are optional. Leave them null and the page simply
+   doesn't mention them — nothing invented, no placeholder shown.
    ═══════════════════════════════════════════════════════════════════ */
 const BIZ = {
   phone   : "+12535616361",        // powers the call and text links
   display : "(253) 561-6361",      // how the number reads on screen
-  area    : "CONFIRM_WITH_JOE",    // e.g. "Tacoma & South Sound"
-  hours   : "CONFIRM_WITH_JOE",    // e.g. "Mon–Sat, 8am–7pm"
+  area    : null,                  // e.g. "Tacoma & South Sound"
+  hours   : null,                  // e.g. "Mon–Sat, 8am–7pm"
 };
 
-/* PHOTOS — drop files into photos/ and put the filename in `file`.
-   Leave it null and the slot stays a labelled placeholder.        */
+/* PHOTOS — drop files into photos/ and list them here. The gallery
+   section only appears once this list has something in it.           */
 const PHOTOS = [
-  { file:null, want:"A car mid-job with tools out, at someone's house" },
-  { file:null, want:"Before and after on a dent or a scrape" },
-  { file:null, want:"A finished respray or a panel he colour-matched" },
-  { file:null, want:"An engine bay he's just worked in" },
-  { file:null, want:"Brakes off, rotors visible" },
-  { file:null, want:"Joe himself, working — people book a person" },
+  // { file:"engine-bay.jpg", alt:"An engine bay after a timing belt" },
 ];
 /* ═══════════════════════════════════════════════════════════════════ */
 
-/* What Joe does, by area of the car. R&R = remove and replace. */
+/* What Joe does, by area of the car — in tour order, front to back.
+   R&R = remove and replace. */
 const ZONES = [
-  { id:"under",  n:"05", name:"Underneath",
-    ops:[["Exhaust section","R&R"],["Muffler","R&R"],["Shocks & struts","R&R"],
-         ["Control arm","R&R"],["Fluid leak","Diagnose"],["Oil pan gasket","R&R"]] },
-  { id:"body",   n:"04", name:"Body & paint",
-    ops:[["Door ding","Pull"],["Deep scratch","Refinish"],["Panel replacement","R&R"],
-         ["Full respray","Quote"],["Rust cut-out","Repair"],["Colour match","Refinish"]] },
-  { id:"engine", n:"01", name:"Hood & engine bay",
+  { id:"engine", n:"01", name:"Hood & engine bay", title:"Where most calls start.",
+    blurb:"Servicing through to swaps, in your driveway. If it won&rsquo;t start he works out <b>why</b> before anything gets replaced &mdash; and if it genuinely needs a new engine, he quotes it.",
+    focus:[696,196,196,112],
     ops:[["Oil & filter","Service"],["Drive belt","R&R"],["Radiator hose","R&R"],
          ["Alternator","R&R"],["Starter motor","R&R"],["Battery & terminals","R&R"],
          ["Timing belt","R&R"],["Engine swap","Quote"],["Won't start","Diagnose"]] },
-  { id:"front",  n:"02", name:"Front end",
+  { id:"front",  n:"02", name:"Front end", title:"Bumpers, guards and lights.",
+    blurb:"The parts that take the hit. Bumper covers, guards, fenders, headlight assemblies and grilles come off and go back on, and the paint is matched to the panel next to it.",
+    focus:[796,204,128,104],
     ops:[["Front guard / bumper","R&R"],["Fender","R&R"],["Headlight assembly","R&R"],
          ["Grille","R&R"],["Dent pull","Repair"],["Paint match","Refinish"]] },
-  { id:"cabin",  n:"06", name:"Cabin & electrical",
-    ops:[["A/C not cold","Diagnose"],["Blower motor","R&R"],["Window regulator","R&R"],
-         ["Door lock actuator","R&R"],["Wiring fault","Diagnose"],["Dash warning light","Diagnose"]] },
-  { id:"wheels", n:"03", name:"Wheels & brakes",
+  { id:"wheels", n:"03", name:"Wheels & brakes", title:"Pads, rotors, calipers.",
+    blurb:"A grinding or squealing stop gets <b>diagnosed first</b>, so you replace what&rsquo;s worn and not what isn&rsquo;t. Wheel bearings and tyre swaps are done on the spot.",
+    focus:[690,218,142,136],
     ops:[["Brake pads","R&R"],["Rotors","R&R"],["Calipers","R&R"],
          ["Wheel bearing","R&R"],["Tyre swap","Service"],["Grinding or squeal","Diagnose"]] },
+  { id:"body",   n:"04", name:"Body & paint", title:"From a door ding to a full respray.",
+    blurb:"Dings pulled, deep scratches refinished, rust cut out and panels replaced. Colour is matched to <b>your</b> car, whether it&rsquo;s one door or the whole thing.",
+    focus:[90,130,620,186],
+    ops:[["Door ding","Pull"],["Deep scratch","Refinish"],["Panel replacement","R&R"],
+         ["Full respray","Quote"],["Rust cut-out","Repair"],["Colour match","Refinish"]] },
+  { id:"under",  n:"05", name:"Underneath", title:"Exhaust, suspension, leaks.",
+    blurb:"Exhaust sections and mufflers, shocks and struts, control arms and oil-pan gaskets. If something&rsquo;s dripping, he finds the <b>source</b> rather than topping it up.",
+    focus:[80,276,840,80],
+    ops:[["Exhaust section","R&R"],["Muffler","R&R"],["Shocks & struts","R&R"],
+         ["Control arm","R&R"],["Fluid leak","Diagnose"],["Oil pan gasket","R&R"]] },
+  { id:"cabin",  n:"06", name:"Cabin & electrical", title:"The things that stop working inside.",
+    blurb:"A/C that isn&rsquo;t cold, blower motors, window regulators, door-lock actuators. Wiring faults and dash warning lights get traced back to the cause, not just cleared.",
+    focus:[336,128,392,176],
+    ops:[["A/C not cold","Diagnose"],["Blower motor","R&R"],["Window regulator","R&R"],
+         ["Door lock actuator","R&R"],["Wiring fault","Diagnose"],["Dash warning light","Diagnose"]] },
 ];
 
-const SHAPES = {
-  under : [{t:"rect", x:300, y:290, w:400, h:44}],
-  body  : [{t:"poly", p:"96,224 306,214 700,210 700,290 96,290"}],
-  engine: [{t:"poly", p:"700,206 866,222 872,268 700,268"}],
-  front : [{t:"poly", p:"866,220 920,244 934,286 872,290 872,264"}],
-  cabin : [{t:"poly", p:"306,214 400,146 596,134 704,208 700,212"}],
-  wheels: [{t:"circ", cx:236, cy:294, r:62},{t:"circ", cx:764, cy:294, r:62}],
-};
-/* Keep every badge clear of the hit shapes of zones painted LATER in this
-   list — those sit on top and would swallow the tap. The engine badge in
-   particular must stay outside the front wheel's r=62 circle at (764,294). */
-const PINS = {
-  engine:[800,230], front:[898,262], wheels:[764,294],
-  body:[400,252],   under:[500,312],  cabin:[500,178],
+/* Callout leaders on the drawing: dot on the part, line, label. */
+const CALLOUTS = {
+  engine:{ dot:[782,262], via:[782,186], end:[806,186], label:"Engine bay" },
+  front :{ dot:[903,248], via:[903,212], end:[870,212], label:"Front end", anchor:"end" },
+  wheels:{ dot:[760,322], via:[760,346], end:[760,346], label:"Disc & caliper", anchor:"middle" },
+  body  :{ dot:[420,200], via:[420,118], end:[444,118], label:"Body & paint" },
+  under :{ dot:[385,330], via:[385,368], end:[408,368], label:"Underside" },
+  cabin :{ dot:[554,240], via:[554,112], end:[578,112], label:"Cabin" },
 };
 
 const SVGNS = "http://www.w3.org/2000/svg";
 const el = (n,a={}) => { const e=document.createElementNS(SVGNS,n);
   for(const k in a) e.setAttribute(k,a[k]); return e; };
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ── values, or a visible placeholder ────────────────────────────────── */
-const NEED = "CONFIRM_WITH_JOE";
-function fill(sel, val){
-  document.querySelectorAll(sel).forEach(n => {
-    if(val === NEED) n.innerHTML = '<span class="todo">need from Joe</span>';
-    else n.textContent = val;
-  });
+/* ── business details ────────────────────────────────────────────────── */
+$$("[data-display]").forEach(n => n.textContent = BIZ.display);
+$$("[data-tel]").forEach(n => n.setAttribute("href","tel:"+BIZ.phone));
+$$("[data-sms]").forEach(n => n.setAttribute("href","sms:"+BIZ.phone));
+if(BIZ.area){
+  $$("[data-area-inline]").forEach(n => n.textContent = "· " + BIZ.area);
+  const s = document.createElement("span"); s.innerHTML = "Comes to you · <b></b>";
+  s.querySelector("b").textContent = BIZ.area; $("#foot-meta").append(s);
 }
-fill("[data-area]",  BIZ.area);
-fill("[data-hours]", BIZ.hours);
-document.querySelectorAll("[data-display],[data-display-big]")
-  .forEach(n => n.textContent = BIZ.display);
-document.querySelectorAll("[data-tel]").forEach(n => n.setAttribute("href","tel:"+BIZ.phone));
-
-/* ── keep the oversized number on screen whatever it is edited to ────── */
-const plate = document.querySelector(".plate-num");
-function fitPlate(){
-  plate.style.fontSize = "";
-  const rng = document.createRange(); rng.selectNodeContents(plate);
-  const w = rng.getBoundingClientRect().width;
-  const avail = window.innerWidth - plate.getBoundingClientRect().left - 14;
-  if(w > avail && w > 0){
-    const fs = parseFloat(getComputedStyle(plate).fontSize);
-    plate.style.fontSize = Math.floor(fs * avail / w) + "px";
-  }
+if(BIZ.hours){
+  $$("[data-hours-inline]").forEach(n => n.textContent = BIZ.hours);
+  const s = document.createElement("span"); s.innerHTML = "Hours <b></b>";
+  s.querySelector("b").textContent = BIZ.hours; $("#foot-meta").append(s);
 }
-addEventListener("resize", fitPlate);
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitPlate);
-fitPlate();
+if(!BIZ.hours) $$(".is-hero .sub .line").forEach(n => n.remove());
 
-/* ── diagram ─────────────────────────────────────────────────────────── */
-const zonesG = document.getElementById("zones");
-ZONES.forEach((z,i) => {
-  const g = el("g",{class:"zone",role:"radio",tabindex:i===0?"0":"-1",
-                    "aria-checked":"false","aria-label":z.name,"data-id":z.id});
-  SHAPES[z.id].forEach(s => {
-    const mk = k => s.t==="rect" ? el("rect",{class:k,x:s.x,y:s.y,width:s.w,height:s.h})
-              : s.t==="circ" ? el("circle",{class:k,cx:s.cx,cy:s.cy,r:s.r})
-              : el("polygon",{class:k,points:s.p});
-    g.append(mk("wash"), mk("hit"));
-  });
-  const [px,py] = PINS[z.id];
-  g.append(el("circle",{class:"pin",cx:px,cy:py,r:17}));
-  const t = el("text",{class:"pin-n",x:px,y:py}); t.textContent = z.n;
-  g.append(t);
-  zonesG.append(g);
-});
-
-const railN = document.getElementById("rail-n");
-const railT = document.getElementById("rail-t");
-const railF = document.getElementById("rail-foot");
-const opsUl = document.getElementById("ops");
-const gs    = [...zonesG.querySelectorAll(".zone")];
-
-function select(id){
-  const z = ZONES.find(v => v.id === id);
-  gs.forEach(g => {
-    const on = g.dataset.id === id;
-    g.setAttribute("aria-checked", String(on));
-    g.setAttribute("tabindex", on ? "0" : "-1");
-  });
-  railN.textContent = z.n;
-  railT.textContent = z.name;
-  railF.textContent = z.ops.length + " common jobs in this area.";
-  opsUl.replaceChildren(...z.ops.map(([op,kind],i) => {
-    const li = document.createElement("li");
-    li.innerHTML = '<span class="idx"></span><span class="op"></span><span class="kind"></span>';
-    li.querySelector(".idx").textContent  = String(i+1).padStart(2,"0");
-    li.querySelector(".op").textContent   = op;
-    li.querySelector(".kind").textContent = kind;
-    return li;
+/* ── build the zone steps, callouts and rail from ZONES ──────────────── */
+const stepsWrap = $("#steps"), endStep = $(".step.is-end");
+const callouts = $("#callouts"), rail = $("#rail");
+ZONES.forEach(z => {
+  const a = document.createElement("article");
+  a.className = "step"; a.dataset.focus = z.id;
+  a.innerHTML = '<div><p class="k"><b></b><span></span></p><h2></h2><p></p><ul class="chips"></ul></div>';
+  a.querySelector(".k b").textContent = z.n;
+  a.querySelector(".k span").textContent = z.name;
+  a.querySelector("h2").textContent = z.title;
+  a.querySelector("h2 + p").innerHTML = z.blurb;
+  a.querySelector(".chips").append(...z.ops.map(([op,kind]) => {
+    const li = document.createElement("li"); li.textContent = op;
+    const i = document.createElement("i"); i.textContent = kind; li.append(i); return li;
   }));
-}
+  stepsWrap.insertBefore(a, endStep);
 
-gs.forEach((g,i) => {
-  g.addEventListener("click", () => select(g.dataset.id));
-  g.addEventListener("keydown", e => {
-    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); select(g.dataset.id); }
-    else if(e.key === "ArrowRight" || e.key === "ArrowDown"){
-      e.preventDefault(); const n = gs[(i+1)%gs.length]; n.focus(); select(n.dataset.id);
-    } else if(e.key === "ArrowLeft" || e.key === "ArrowUp"){
-      e.preventDefault(); const n = gs[(i-1+gs.length)%gs.length]; n.focus(); select(n.dataset.id);
-    }
-  });
+  const c = CALLOUTS[z.id];
+  const g = el("g",{class:"co","data-part":z.id});
+  g.append(
+    el("circle",{class:"co-ring",cx:c.dot[0],cy:c.dot[1],r:7}),
+    el("circle",{class:"co-dot", cx:c.dot[0],cy:c.dot[1],r:2.5}),
+    el("path",{class:"co-line",d:`M${c.dot[0]} ${c.dot[1]} L${c.via[0]} ${c.via[1]} L${c.end[0]} ${c.end[1]}`}));
+  /* offsets are in em so they shrink with the zoom like the type does */
+  const an = c.anchor || "start", dx = an === "start" ? ".45em" : an === "end" ? "-.45em" : "0";
+  const tn = el("text",{class:"co-n",x:c.end[0],y:c.end[1],dx,dy:an === "middle" ? "1.5em" : "-.35em","text-anchor":an});
+  tn.textContent = z.n + " —";
+  const tt = el("text",{class:"co-t",x:c.end[0],y:c.end[1],dx,dy:an === "middle" ? "2.7em" : ".95em","text-anchor":an});
+  tt.textContent = z.name;
+  g.append(tn, tt); callouts.append(g);
+
+  const li = document.createElement("li");
+  const b = document.createElement("button"); b.type = "button"; b.dataset.go = z.id;
+  b.innerHTML = '<span></span>'; b.querySelector("span").textContent = z.n + "  " + z.name;
+  b.setAttribute("aria-label", "Go to " + z.name);
+  li.append(b); rail.append(li);
 });
 
 /* ── the written-out index, from the same data ───────────────────────── */
-document.getElementById("index-cols").replaceChildren(
-  ...[...ZONES].sort((a,b) => a.n.localeCompare(b.n)).map(z => {
-    const d  = document.createElement("div"); d.className = "grp";
-    const h  = document.createElement("h3");  h.textContent = z.n + " — " + z.name;
-    const ul = document.createElement("ul");
-    ul.append(...z.ops.map(([op,kind]) => {
-      const li = document.createElement("li");
-      li.innerHTML = '<b></b> — <span></span>';
-      li.querySelector("b").textContent = op;
-      li.querySelector("span").textContent = kind.toLowerCase();
-      return li;
-    }));
-    d.append(h, ul);
-    return d;
-  })
-);
-
-/* ── gallery: real photo or a labelled empty slot ────────────────────── */
-const shots = document.getElementById("shots");
-shots.replaceChildren(...PHOTOS.map((p,i) => {
-  const fig = document.createElement("figure");
-  fig.className = "shot";
-  if(p.file){
-    const img = document.createElement("img");
-    img.src = "photos/" + p.file; img.alt = p.want; img.loading = "lazy";
-    fig.append(img);
-  } else {
-    const slot = document.createElement("div");
-    slot.className = "slot";
-    slot.innerHTML = '<span class="sn"></span><span class="sw"></span>';
-    slot.querySelector(".sn").textContent = "SLOT " + String(i+1).padStart(2,"0");
-    slot.querySelector(".sw").textContent = p.want;
-    fig.append(slot);
-  }
-  return fig;
+$("#index-cols").replaceChildren(...ZONES.map(z => {
+  const d  = document.createElement("div"); d.className = "grp";
+  const h  = document.createElement("h3");  h.textContent = z.n + " — " + z.name;
+  const ul = document.createElement("ul");
+  ul.append(...z.ops.map(([op,kind]) => {
+    const li = document.createElement("li");
+    li.innerHTML = '<b></b> — <span></span>';
+    li.querySelector("b").textContent = op;
+    li.querySelector("span").textContent = kind.toLowerCase();
+    return li;
+  }));
+  d.append(h, ul); return d;
 }));
-const waiting = PHOTOS.filter(p => !p.file).length;
-document.getElementById("gallery-note").textContent = waiting
-  ? waiting + " of " + PHOTOS.length + " slots still waiting on photos. Drop files into the "
-    + "photos folder and add the filenames to the PHOTOS list to fill them."
-  : "";
 
-/* ── reveal on entry ─────────────────────────────────────────────────
-   Runs last, so it catches the pins and photo tiles built above. The
-   hidden state is only ever applied by this block, which means every
-   path that skips it — no script, no observer, reduced motion — leaves
-   the page fully visible instead of blank.                            */
+/* ── gallery: only when there's something real to show ───────────────── */
+if(PHOTOS.length){
+  $("#gallery").classList.add("has-photos");
+  $("#shots").replaceChildren(...PHOTOS.map(p => {
+    const fig = document.createElement("figure"); fig.className = "shot";
+    const img = document.createElement("img");
+    img.src = "photos/" + p.file; img.alt = p.alt || ""; img.loading = "lazy";
+    fig.append(img); return fig;
+  }));
+}
+
+/* ══ THE TOUR ═══════════════════════════════════════════════════════════
+   The stage is a pinned <svg>. Zooming is one CSS transform on it:
+   scale about (0,0) and translate so the chosen focus box lands in the
+   middle of the car area. Strokes use non-scaling-stroke so the drawing
+   stays hairline-thin however far in we go.
+   ------------------------------------------------------------------ */
+const stage = $("#stage"), car = $("#car"), box = $("#car-box"), area = $(".car-area");
+const steps = $$(".step"), prog = $("#prog");
+const mobileMQ = matchMedia("(max-width:899px)");
+const FOCUS = Object.fromEntries(ZONES.map(z => [z.id, z.focus]));
+let active = null;
+
+function applyFocus(id){
+  const w = box.clientWidth, h = box.clientHeight, unit = w / 1000;
+  const A = area.getBoundingClientRect();
+  const f = FOCUS[id];
+  let s = 1, cx = 500, cy = 200;
+  if(f){
+    cx = f[0] + f[2]/2; cy = f[1] + f[3]/2;
+    const padW = mobileMQ.matches ? .9 : .84, padH = mobileMQ.matches ? .78 : .74;
+    s = Math.min(A.width*padW / (f[2]*unit), A.height*padH / (f[3]*unit));
+    s = Math.max(1, Math.min(4.6, s));
+  }
+  /* point p -> s*p + t, with t chosen so the focus centre sits at the box centre */
+  const tx = w/2 - s*cx*unit, ty = h/2 - s*cy*unit;
+  car.style.transform = `translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${s.toFixed(3)})`;
+  car.style.setProperty("--inv", (1/(s*unit)).toFixed(4));   /* text stays a fixed screen size */
+}
+
+function setActive(id){
+  if(id === active) return;
+  active = id;
+  const zone = FOCUS[id] ? id : null;
+  if(zone) stage.dataset.focus = zone; else delete stage.dataset.focus;
+  stage.classList.toggle("is-xray", !!zone);
+  $$(".part,.co").forEach(p => p.classList.toggle("is-on", p.dataset.part === zone));
+  $$("#rail button").forEach(b => b.classList.toggle("is-on", b.dataset.go === zone));
+  const i = ZONES.findIndex(z => z.id === zone);
+  prog.style.width = zone ? ((i+1) / ZONES.length * 100) + "%" : (id === "end" ? "100%" : "0%");
+  applyFocus(id);
+}
+
+/* which step is in front of the reader: the one crossing a thin band */
+let io;
+function watchSteps(){
+  if(io) io.disconnect();
+  const band = mobileMQ.matches ? "-64% 0px -30% 0px" : "-48% 0px -48% 0px";
+  io = new IntersectionObserver(es => {
+    es.forEach(e => { if(e.isIntersecting) setActive(e.target.dataset.focus); });
+  }, { rootMargin: band, threshold: 0 });
+  steps.forEach(s => io.observe(s));
+}
+watchSteps();
+mobileMQ.addEventListener("change", () => { watchSteps(); applyFocus(active); });
+addEventListener("resize", () => applyFocus(active));
+
+/* the rail jumps to a step */
+rail.addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  const s = steps.find(x => x.dataset.focus === b.dataset.go);
+  const top = s.getBoundingClientRect().top + scrollY - (mobileMQ.matches ? stage.offsetHeight : 0) + 2;
+  scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+});
+
+/* hide the scroll cue once they've moved */
+addEventListener("scroll", () => { if(scrollY > 40) document.documentElement.classList.add("scrolled"); }, { passive:true });
+
+/* ── arrival: the car rolls in, then the lines draw themselves ───────── */
 (() => {
-  if(!matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
-  if(!("IntersectionObserver" in window)) return;
-
-  const els = [...document.querySelectorAll(
-    ".hr, .shot, .plan .body, .plan .detail, .plan .glass, .plan .tyre," +
-    ".plan .hub, .plan .spoke, .zone .pin, .zone .pin-n")];
-  if(!els.length) return;
-
-  els.forEach(e => e.classList.add("pre"));
-  const io = new IntersectionObserver((entries, obs) => {
-    entries.forEach(en => {
-      if(en.isIntersecting){ en.target.classList.remove("pre"); obs.unobserve(en.target); }
+  if(reduced) return;
+  document.documentElement.classList.add("arrive");
+  /* dash lengths are in screen px under non-scaling-stroke, so scale by
+     the current px-per-unit. Resting state is fully drawn: if any of
+     this fails, the car is simply there. */
+  const k = box.clientWidth / 1000;
+  const paths = $$(".car .draw");
+  paths.forEach((p,i) => {
+    let L = 0; try { L = p.getTotalLength() * k * 1.02; } catch(e){ return; }
+    if(!L) return;
+    p.style.strokeDasharray = L + " " + L;
+    p.style.strokeDashoffset = L;
+    p.style.transition = "none";
+  });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    paths.forEach((p,i) => {
+      p.style.transition = `stroke-dashoffset 1.5s cubic-bezier(.6,0,.3,1) ${(0.35 + i*0.035).toFixed(2)}s`;
+      p.style.strokeDashoffset = 0;
     });
-  }, { rootMargin:"0px 0px -6% 0px" });
-  els.forEach(e => io.observe(e));
+  }));
+  setTimeout(() => paths.forEach(p => { p.style.strokeDasharray = ""; p.style.strokeDashoffset = ""; p.style.transition = ""; }), 3800);
+})();
 
-  /* Belt and braces: nothing is still hidden a few seconds in, whatever
-     went wrong. An unseen animation is a far smaller problem than an
-     invisible page. */
-  setTimeout(() => els.forEach(e => e.classList.remove("pre")), 4000);
+/* initial state */
+setActive("all");
+
+/* ── reveals below the fold ──────────────────────────────────────────── */
+(() => {
+  if(reduced || !("IntersectionObserver" in window)) return;
+  const els = $$(".hr, .shot, .step:not(.is-hero) > div");
+  els.forEach(e => e.classList.add("pre"));
+  const io2 = new IntersectionObserver((entries, obs) => {
+    entries.forEach(en => { if(en.isIntersecting){ en.target.classList.remove("pre"); obs.unobserve(en.target); } });
+  }, { rootMargin:"0px 0px -8% 0px" });
+  els.forEach(e => io2.observe(e));
+  setTimeout(() => els.forEach(e => e.classList.remove("pre")), 5000);
 })();
 </script>

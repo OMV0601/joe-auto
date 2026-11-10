@@ -17,31 +17,26 @@ Open `index.html`, scroll to the bottom, find this block:
 const BIZ = {
   phone   : "+12535616361",
   display : "(253) 561-6361",
-  area    : "CONFIRM_WITH_JOE",
-  hours   : "CONFIRM_WITH_JOE",
+  area    : null,   // e.g. "Tacoma & South Sound"
+  hours   : null,   // e.g. "Mon–Sat, 8am–7pm"
 };
 ```
 
-Anything left as `CONFIRM_WITH_JOE` shows on the page as a dashed **need from
-Joe** tag. That's deliberate — a missing fact stays visible instead of being
-quietly replaced with a plausible-sounding invention.
-
-| Field | What to ask him |
-|---|---|
-| `area` | The area he covers, e.g. `"Tacoma & South Sound"` |
-| `hours` | When he takes calls, e.g. `"Mon–Sat, 8am–7pm"` |
+`area` and `hours` are optional. Left as `null`, the page simply doesn't
+mention them — no placeholder, nothing invented. Fill them in once Joe confirms
+and they appear in the hero line and the footer.
 
 The 253 area code points at Tacoma / South Sound, WA — **that's a guess, not
-something Joe said.** Confirm before publishing.
+something Joe said.** Confirm before publishing an area.
 
 `phone` must stay in `+1XXXXXXXXXX` form; it powers the call and text links.
 `display` is only what's printed on screen.
 
 ## Photos
 
-Six empty slots are waiting. See [photos/README.md](photos/README.md) for what to
-ask Joe for and how to add them — it's written so you can forward it to him
-more or less as-is.
+There is no gallery on the page until there is something real to put in it.
+See [photos/README.md](photos/README.md) — once Joe sends a picture, drop it
+in that folder, list it in `PHOTOS`, and the section appears.
 
 ---
 
@@ -96,33 +91,48 @@ the hosted preview blocks external requests — a `<link>` would silently fall
 back to system fonts and quietly destroy the type hierarchy. Zilla Slab for
 headings, IBM Plex Sans for prose, IBM Plex Mono for numbers and labels.
 
-**The diagram** is hand-drawn SVG. The six areas are real radio buttons: one tab
-stop, arrow keys to move between them. Every badge is positioned to stay clear
-of overlapping hit areas — the engine badge in particular has to sit outside the
-front wheel's hit circle or the wheel swallows the tap.
+**The landing screen is a tour of the car.** One technical drawing stays
+pinned while the copy scrolls past it; each step tells the drawing which part
+to look at. Opening: the whole car. Then the engine bay, front end, a wheel,
+the bodywork, the underside, the cabin — and back out to the whole car with the
+number. Six areas, no photographs needed.
 
-**The service list** underneath is generated from the same data as the diagram,
-so there's one source of truth and everything is readable without interacting
-with the SVG at all.
+How it works, in three pieces:
+
+1. **Pinned stage.** `.stage` is `position: sticky`; the `.steps` column scrolls
+   over it (desktop, left 44%) or under it (phone, where the stage is the top
+   42% of the screen). An `IntersectionObserver` with a thin band in the
+   middle of the viewport decides which step is "in front of" the reader.
+2. **Zoom is one CSS transform.** `applyFocus()` takes the active area's focus
+   box in drawing units, works out the scale that fits it in the car area, and
+   sets `translate() scale()` on the `<svg>` so the box's centre lands in the
+   middle of the stage. A 1.15s transition does the camera move. Every stroke
+   uses `vector-effect: non-scaling-stroke`, so lines stay hairline at 4× zoom,
+   and label text is sized by `1 / (zoom × px-per-unit)` so it stays the same
+   size on screen whatever the zoom.
+3. **X-ray.** Each area's internals (engine block, brake disc and caliper,
+   exhaust run, seats and harness…) live in their own `<g class="part">`,
+   hidden until their step is active. When any part is lit the shell drops to
+   40% so the internals read.
+
+**One source of truth.** `ZONES` at the bottom of the file holds the areas, the
+copy, the focus boxes and the job lists. The tour steps, the callouts on the
+drawing, the right-hand rail and the written-out index are all generated from
+it.
 
 ### Motion
 
-Two mechanisms, split by how bad it is when each one fails.
+**Reveals** — the drawing stroking itself in on load, step copy rising in,
+section rules sweeping across — have a *visible* resting state. Script adds a
+hidden class, an observer removes it, and a timeout clears everything after a
+few seconds regardless. No script, no observer, a printer: the page still
+shows everything. (Because of `non-scaling-stroke`, dash lengths are in screen
+pixels, so the draw-on measures each path and multiplies by the render scale
+rather than using the usual `pathLength="1"` trick.)
 
-**Reveals** — the blueprint drawing itself, photos settling in, section rules
-stroking across — run on IntersectionObserver and plain CSS transitions. These
-decide whether content is *visible*, so they must never depend on a scroll
-timeline resolving. The resting state in the CSS is fully visible; script adds a
-`.pre` class to hide, the observer removes it, and a timeout clears it after
-four seconds no matter what. No script, no observer, a stalled timeline, a
-printer — the page still shows everything. An unseen animation is a far smaller
-problem than an invisible page.
-
-**Continuous effects** — the phone number drifting against the scroll, the
-wheels turning as the car arrives — use CSS scroll-driven animation
-(`animation-timeline`), which runs off the main thread and is genuinely better
-at this. Neither can hide anything: if the timeline never resolves, the number
-just sits still.
+**Continuous effects** — the car rolling in from the right on load, and the
+wheels turning with the scroll via `animation-timeline: scroll()` — can't hide
+anything if they fail to run.
 
 Everything is off under `prefers-reduced-motion: reduce`.
 

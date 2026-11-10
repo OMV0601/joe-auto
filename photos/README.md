@@ -5,14 +5,15 @@ near the bottom of `index.html`:
 
 ```js
 const PHOTOS = [
-  { file:"engine-bay.jpg", want:"An engine bay he's just worked in" },
-  { file:null,             want:"Before and after on a dent or a scrape" },
-  ...
+  { file:"engine-bay.jpg", alt:"An engine bay after a timing belt" },
+  { file:"respray.jpg",    alt:"A colour-matched rear door" },
 ];
 ```
 
-`file:null` leaves the slot as a marked empty placeholder. Any filename you put
-there gets loaded from this folder.
+The gallery section is hidden while this list is empty, so the page never
+shows an empty slot. Add one entry and the section appears with that photo.
+
+Files are loaded from this folder; `alt` is the text a screen reader gets.
 
 ---
 
@@ -33,7 +34,7 @@ Six shots, roughly in order of how much they're worth:
 
 ### Tell him
 
-- Landscape, not portrait. The slots are 4:3 and landscape fills them properly.
+- Landscape, not portrait. The tiles are 4:3 and landscape fills them properly.
 - Daylight. No flash. Phone camera is completely fine.
 - Wipe the lens first — it's usually the difference between a sharp photo and a
   soft one.
@@ -46,5 +47,4 @@ Six shots, roughly in order of how much they're worth:
   3–6 MB each and six of those makes the page slow on mobile data — which is
   exactly where it'll be opened.
 - Save as `.jpg`. Name them plainly: `dent-before.jpg`, `dent-after.jpg`.
-- The `alt` text comes from the `want` field, so keep it describing the actual
-  photo once you swap a real one in.
+- Write the `alt` to describe what's actually in the photo.
